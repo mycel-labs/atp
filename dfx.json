@@ -1,0 +1,17 @@
+{
+  "canisters": {
+    "atp_backend": {
+      "candid": "src/atp_backend/atp_backend.did",
+      "package": "atp_backend",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
