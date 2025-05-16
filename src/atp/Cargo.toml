@@ -1,5 +1,5 @@
 [package]
-name = "atp_backend"
+name = "atp"
 version = "0.1.0"
 edition = "2021"
 

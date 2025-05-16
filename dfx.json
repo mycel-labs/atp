@@ -1,8 +1,8 @@
 {
   "canisters": {
-    "atp_backend": {
-      "candid": "src/atp_backend/atp_backend.did",
-      "package": "atp_backend",
+    "atp": {
+      "candid": "src/atp/atp.did",
+      "package": "atp",
       "type": "rust"
     }
   },

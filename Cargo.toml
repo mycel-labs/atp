@@ -1,5 +1,5 @@
 [workspace]
 members = [
-    "src/atp_backend"
+    "src/atp"
 ]
 resolver = "2"
