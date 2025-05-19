@@ -68,6 +68,22 @@ pub fn unlock_account(account_id: String) -> Result<AccountReply, String> {
     Ok(service.to_account_reply(&account))
 }
 
+/// Transfer an account
+///
+/// Only the approved address can transfer an account
+/// The account must be in the Locked state.
+#[update]
+pub fn transfer_account(account_id: String, to: Principal) -> Result<AccountReply, String> {
+    let (account_repository, signer_repository) = init_repositories();
+    let service = AccountService::new(account_repository, signer_repository);
+
+    // Transfer the account
+    let account = service.transfer_account(account_id, to)?;
+
+    // Convert to DTO before returning
+    Ok(service.to_account_reply(&account))
+}
+
 /// Activate an account
 ///
 /// Only the owner can activate an account.

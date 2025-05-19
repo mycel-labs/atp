@@ -82,6 +82,15 @@ impl AccountService {
         self.account_repository.insert(account.clone())
     }
 
+    pub fn transfer_account(&self, account_id: String, to: Principal) -> Result<Account, String> {
+        // Check if the account exists
+        let mut account = self.account_repository.get(&account_id)?;
+        // Transfer the account
+        account.transfer_account(to)?;
+        // update the account in the repository
+        self.account_repository.insert(account.clone())
+    }
+
     pub fn activate_account(&self, account_id: String) -> Result<Account, String> {
         // Check if the account exists
         let mut account = self.account_repository.get(&account_id)?;
