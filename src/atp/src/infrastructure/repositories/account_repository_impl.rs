@@ -77,9 +77,7 @@ mod account_repository_tests {
         Account::new(
             id.to_string(),
             owner,
-            vec![1, 2, 3], // dummy public_key_sec1
-            vec![4, 5, 6], // dummy public_key_x
-            vec![7, 8, 9], // dummy public_key_y
+            vec![1, 2, 3], // dummy public_key
             SignatureAlgorithm::Ecdsa,
             Curve::Secp256k1,
             owner, // approved_address is the same as owner for test simplicity
