@@ -6,8 +6,9 @@ use std::borrow::Cow;
 use crate::domain::models::signer::{Curve, SignatureAlgorithm};
 use crate::generate_getters;
 use crate::utils::eth_utils::generate_eth_address_from_xy;
+use crate::utils::ic::api::get_ic_api;
 
-#[derive(CandidType, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(CandidType, Clone, Serialize, Deserialize, PartialEq, Debug)]
 pub enum AccountState {
     #[serde(rename = "locked")]
     Locked,
@@ -71,6 +72,7 @@ impl Account {
     // Constructor method for creating a new account
     pub fn new(
         id: String,
+        owner: Principal,
         public_key: Vec<u8>,
         public_key_x: Vec<u8>,
         public_key_y: Vec<u8>,
@@ -80,7 +82,7 @@ impl Account {
     ) -> Self {
         Account {
             id,
-            owner: ic_cdk::api::caller(),
+            owner,
             public_key,
             public_key_x,
             public_key_y,
@@ -136,7 +138,8 @@ impl Account {
 
     // Transfer the account to a new owner, only allowed if locked and approved
     pub fn transfer_account(&mut self, to: Principal) -> Result<Account, String> {
-        if self.is_approved(ic_cdk::api::caller()) {
+        let ic_api = get_ic_api();
+        if self.is_approved(ic_api.caller()) {
             if self.account_state == AccountState::Locked {
                 // Reset the owner and remove the approved address
                 self.owner = to;
@@ -154,7 +157,8 @@ impl Account {
 
     // Approve an address, allowing only the owner to approve
     pub fn approve_address(&mut self, address: Principal) -> Result<Account, String> {
-        if self.is_owner(ic_cdk::api::caller()) {
+        let ic_api = get_ic_api();
+        if self.is_owner(ic_api.caller()) {
             // Check if the address is already approved
             match &self.approved_address {
                 Some(approved_address) => {
@@ -180,7 +184,8 @@ impl Account {
 
     // Revoke an address, ensuring only the owner can revoke
     pub fn revoke_address(&mut self, address: Principal) -> Result<Account, String> {
-        if self.is_owner(ic_cdk::api::caller()) {
+        let ic_api = get_ic_api();
+        if self.is_owner(ic_api.caller()) {
             match &self.approved_address {
                 // Revoke the address if it is already approved
                 Some(approved_address) => {
@@ -202,7 +207,8 @@ impl Account {
         match self.account_state {
             AccountState::Locked => {
                 // Check if the caller is approved application
-                if self.is_approved(ic_cdk::api::caller()) || self.is_approved(ic_cdk::api::id()) {
+                let ic_api = get_ic_api();
+                if self.is_approved(ic_api.caller()) || self.is_approved(ic_api.id()) {
                     self.account_state = AccountState::Unlocked;
                     Ok(self.clone())
                 } else {
@@ -238,7 +244,8 @@ impl Account {
             AccountState::Active => Err("Account is already activated".to_string()),
             AccountState::Unlocked => {
                 // Check if the caller is the owner
-                if self.is_owner(ic_cdk::api::caller()) {
+                let ic_api = get_ic_api();
+                if self.is_owner(ic_api.caller()) {
                     self.account_state = AccountState::Active;
                     Ok(self.clone())
                 } else {
