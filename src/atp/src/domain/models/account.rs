@@ -5,7 +5,6 @@ use std::borrow::Cow;
 
 use crate::domain::models::signer::{Curve, SignatureAlgorithm};
 use crate::generate_getters;
-use crate::utils::eth_utils::generate_eth_address_from_xy;
 use crate::utils::ic::api::get_ic_api;
 
 #[derive(CandidType, Clone, Serialize, Deserialize, PartialEq, Debug)]
@@ -35,8 +34,6 @@ pub struct Account {
     id: String,
     owner: Principal,
     public_key: Vec<u8>,
-    public_key_x: Vec<u8>,
-    public_key_y: Vec<u8>,
     algorithm: SignatureAlgorithm,
     curve: Curve,
     account_state: AccountState,
@@ -60,8 +57,6 @@ pub struct AccountReply {
     pub id: String,
     pub owner: String,
     pub public_key_hex: String,
-    pub public_key_x_hex: String,
-    pub public_key_y_hex: String,
     pub algorithm: SignatureAlgorithm,
     pub curve: Curve,
     pub account_state: AccountState,
@@ -74,8 +69,6 @@ impl Account {
         id: String,
         owner: Principal,
         public_key: Vec<u8>,
-        public_key_x: Vec<u8>,
-        public_key_y: Vec<u8>,
         algorithm: SignatureAlgorithm,
         curve: Curve,
         approved_address: Principal,
@@ -84,8 +77,6 @@ impl Account {
             id,
             owner,
             public_key,
-            public_key_x,
-            public_key_y,
             algorithm,
             curve,
             account_state: AccountState::Locked,
@@ -97,8 +88,6 @@ impl Account {
         id: String,
         owner: Principal,
         public_key: Vec<u8>,
-        public_key_x: Vec<u8>,
-        public_key_y: Vec<u8>,
         algorithm: SignatureAlgorithm,
         curve: Curve,
         account_state: AccountState,
@@ -111,8 +100,6 @@ impl Account {
             id: self.id.clone(),
             owner: self.owner.to_string(),
             public_key_hex: hex::encode(&self.public_key),
-            public_key_x_hex: hex::encode(&self.public_key_x),
-            public_key_y_hex: hex::encode(&self.public_key_y),
             algorithm: self.algorithm.clone(),
             curve: self.curve.clone(),
             account_state: self.account_state.clone(),
@@ -253,21 +240,5 @@ impl Account {
                 }
             }
         }
-    }
-
-    // Generate Ethereum address if using ECDSA
-    pub fn generate_eth_address(&self) -> Result<String, String> {
-        if self.algorithm != SignatureAlgorithm::Ecdsa {
-            return Err(format!(
-                "Cannot generate Ethereum address for algorithm {:?}",
-                self.algorithm
-            ));
-        }
-
-        generate_eth_address_from_xy(
-            hex::encode(&self.public_key_x),
-            hex::encode(&self.public_key_y),
-        )
-        .map_err(|e| format!("Failed to generate Ethereum address: {}", e))
     }
 }

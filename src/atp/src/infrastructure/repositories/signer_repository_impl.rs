@@ -71,12 +71,12 @@ pub struct EcdsaSignatureRequest {
 }
 
 pub struct SignerRepositoryImpl {
-    key_name: String,
+    key_id: String,
 }
 
 impl SignerRepositoryImpl {
-    pub fn new(key_name: String) -> Self {
-        Self { key_name }
+    pub fn new(key_id: String) -> Self {
+        Self { key_id }
     }
 }
 
@@ -85,7 +85,7 @@ impl ISignerRepository for SignerRepositoryImpl {
         &self,
         algorithm: SignatureAlgorithm,
         curve: Curve,
-        derivation_path: &str,
+        derivation_path: String,
     ) -> impl Future<Output = Result<PublicKeyReply, String>> {
         async move {
             let result = match algorithm {
@@ -96,7 +96,7 @@ impl ISignerRepository for SignerRepositoryImpl {
                             derivation_path: vec![derivation_path.as_bytes().to_vec()],
                             key_id: EcdsaKeyId {
                                 curve: EcdsaKeyIdCurve::Ecdsa,
-                                name: self.key_name.clone(),
+                                name: self.key_id.clone(),
                             },
                         };
 
@@ -118,7 +118,7 @@ impl ISignerRepository for SignerRepositoryImpl {
                             derivation_path: vec![derivation_path.as_bytes().to_vec()],
                             key_id: SchnorrKeyId {
                                 algorithm: SchnorrKeyIdAlgorithm::SchnorrBip340Secp256k1,
-                                name: self.key_name.clone(),
+                                name: self.key_id.clone(),
                             },
                         };
 
@@ -137,7 +137,7 @@ impl ISignerRepository for SignerRepositoryImpl {
                             derivation_path: vec![derivation_path.as_bytes().to_vec()],
                             key_id: SchnorrKeyId {
                                 algorithm: SchnorrKeyIdAlgorithm::SchnorrEd25519,
-                                name: self.key_name.clone(),
+                                name: self.key_id.clone(),
                             },
                         };
 
@@ -161,7 +161,7 @@ impl ISignerRepository for SignerRepositoryImpl {
         algorithm: SignatureAlgorithm,
         curve: Curve,
         message_hash: Vec<u8>,
-        derivation_path: &str,
+        derivation_path: String,
     ) -> impl Future<Output = Result<SignatureReply, String>> {
         async move {
             match algorithm {
@@ -171,7 +171,7 @@ impl ISignerRepository for SignerRepositoryImpl {
                         derivation_path: vec![derivation_path.as_bytes().to_vec()],
                         key_id: EcdsaKeyId {
                             curve: EcdsaKeyIdCurve::Ecdsa,
-                            name: self.key_name.clone(),
+                            name: self.key_id.clone(),
                         },
                     };
 
@@ -193,7 +193,7 @@ impl ISignerRepository for SignerRepositoryImpl {
                             derivation_path: vec![derivation_path.as_bytes().to_vec()],
                             key_id: SchnorrKeyId {
                                 algorithm: SchnorrKeyIdAlgorithm::SchnorrBip340Secp256k1,
-                                name: self.key_name.clone(),
+                                name: self.key_id.clone(),
                             },
                         };
 
@@ -213,7 +213,7 @@ impl ISignerRepository for SignerRepositoryImpl {
                             derivation_path: vec![derivation_path.as_bytes().to_vec()],
                             key_id: SchnorrKeyId {
                                 algorithm: SchnorrKeyIdAlgorithm::SchnorrEd25519,
-                                name: self.key_name.clone(),
+                                name: self.key_id.clone(),
                             },
                         };
 
@@ -232,50 +232,56 @@ impl ISignerRepository for SignerRepositoryImpl {
         }
     }
 
-    async fn sign_eip1559_transaction(
+    fn sign_eip1559_transaction(
         &self,
         tx: Eip1559TransactionRequest,
-        derivation_path: &str,
-    ) -> Result<String, String> {
-        const EIP1559_TX_ID: u8 = 2;
+        derivation_path: String,
+    ) -> impl Future<Output = Result<String, String>> {
+        async move {
+            const EIP1559_TX_ID: u8 = 2;
 
-        // Get the public key
-        let public_key = self
-            .generate_public_key(SignatureAlgorithm::Ecdsa, Curve::Secp256k1, derivation_path)
-            .await?
-            .public_key;
+            // Get the public key
+            let public_key = self
+                .generate_public_key(
+                    SignatureAlgorithm::Ecdsa,
+                    Curve::Secp256k1,
+                    derivation_path.clone(),
+                )
+                .await?
+                .public_key;
 
-        // Prepare transaction for signing
-        let mut unsigned_tx_bytes = tx.rlp().to_vec();
-        unsigned_tx_bytes.insert(0, EIP1559_TX_ID);
+            // Prepare transaction for signing
+            let mut unsigned_tx_bytes = tx.rlp().to_vec();
+            unsigned_tx_bytes.insert(0, EIP1559_TX_ID);
 
-        let txhash = keccak256(&unsigned_tx_bytes);
+            let txhash = keccak256(&unsigned_tx_bytes);
 
-        let signature = self
-            .sign(
-                SignatureAlgorithm::Ecdsa,
-                Curve::Secp256k1,
-                txhash.to_vec(),
-                derivation_path,
-            )
-            .await?
-            .signature;
+            let signature = self
+                .sign(
+                    SignatureAlgorithm::Ecdsa,
+                    Curve::Secp256k1,
+                    txhash.to_vec(),
+                    derivation_path.clone(),
+                )
+                .await?
+                .signature;
 
-        // Recover signature parity
-        let v = recover_signature_parity(&txhash, &signature, &public_key)
-            .map_err(|e| format!("Signature recovery failed: {}", e))?;
+            // Recover signature parity
+            let v = recover_signature_parity(&txhash, &signature, &public_key)
+                .map_err(|e| format!("Signature recovery failed: {}", e))?;
 
-        let signature = Signature {
-            v: v as u64,
-            r: U256::from_big_endian(&signature[0..32]),
-            s: U256::from_big_endian(&signature[32..64]),
-        };
+            let signature = Signature {
+                v: v as u64,
+                r: U256::from_big_endian(&signature[0..32]),
+                s: U256::from_big_endian(&signature[32..64]),
+            };
 
-        // Create signed transaction
-        let mut signed_tx_bytes = tx.rlp_signed(&signature).to_vec();
-        signed_tx_bytes.insert(0, EIP1559_TX_ID);
+            // Create signed transaction
+            let mut signed_tx_bytes = tx.rlp_signed(&signature).to_vec();
+            signed_tx_bytes.insert(0, EIP1559_TX_ID);
 
-        Ok(format!("0x{}", hex::encode(&signed_tx_bytes)))
+            Ok(format!("0x{}", hex::encode(&signed_tx_bytes)))
+        }
     }
 }
 

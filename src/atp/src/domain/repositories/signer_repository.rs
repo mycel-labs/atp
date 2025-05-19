@@ -22,7 +22,7 @@ pub trait ISignerRepository {
         &self,
         algorithm: SignatureAlgorithm,
         curve: Curve,
-        derivation_path: &str,
+        derivation_path: String,
     ) -> impl Future<Output = Result<PublicKeyReply, String>> + Send;
 
     fn sign(
@@ -30,12 +30,12 @@ pub trait ISignerRepository {
         algorithm: SignatureAlgorithm,
         curve: Curve,
         message_hash: Vec<u8>,
-        derivation_path: &str,
+        derivation_path: String,
     ) -> impl Future<Output = Result<SignatureReply, String>> + Send;
 
     fn sign_eip1559_transaction(
         &self,
         tx: Eip1559TransactionRequest,
-        derivation_path: &str,
+        derivation_path: String,
     ) -> impl Future<Output = Result<String, String>> + Send;
 }
