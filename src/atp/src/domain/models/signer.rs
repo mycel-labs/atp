@@ -41,32 +41,3 @@ impl Storable for Curve {
 
     const BOUND: Bound = Bound::Unbounded;
 }
-
-pub struct PublicKey {
-    pub sec1: Vec<u8>,
-    pub x: Vec<u8>,
-    pub y: Option<Vec<u8>>,
-}
-
-pub struct ThresholdSigner {
-    algorithm: SignatureAlgorithm,
-    curve: Curve,
-    key_name: String,
-    derivation_path: String,
-}
-
-impl ThresholdSigner {
-    pub fn new(
-        algorithm: SignatureAlgorithm,
-        curve: Curve,
-        key_name: String,
-        derivation_path: String,
-    ) -> Self {
-        ThresholdSigner {
-            algorithm,
-            curve,
-            key_name,
-            derivation_path,
-        }
-    }
-}
