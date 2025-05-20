@@ -25,6 +25,27 @@ dfx start --background
 dfx deploy
 ```
 
+## Network Configuration
+
+ATP uses different key IDs depending on the network you're deploying to. The key ID is defined in `src/atp/src/utils/config.rs`:
+
+```rust
+// Default: For local development with dfx replica
+pub const KEY_ID: &str = "dfx_test_key";
+
+// For testing on the Internet Computer mainnet (uncomment when needed)
+// pub const KEY_ID: &str = "test_key_1";
+
+// For production deployments on the Internet Computer mainnet (uncomment when needed)
+// pub const KEY_ID: &str = "key_1";
+```
+
+When switching networks:
+1. Open `src/atp/src/utils/config.rs`
+2. Comment out the current key ID
+3. Uncomment the key ID for your target network
+4. Rebuild and redeploy the canister
+
 ## Testing Endpoints
 
 Once deployed, you can interact with the ATP canister using the Candid UI (recommended) or through the command line.

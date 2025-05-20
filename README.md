@@ -20,6 +20,14 @@ For detailed documentation, see the following:
 - [Integration Guide](./docs/integration_guide.md) - How to integrate with other canisters
 - [Contribution Guide](./docs/contribution_guide.md) - How to contribute to ATP
 
+## Network Configuration
+When deploying ATP to different networks, you'll need to change the key ID in the `utils/config.rs` file:
+- `dfx_test_key`: For local development with dfx replica
+- `test_key_1`: For testing on the Internet Computer mainnet
+- `key_1`: For production deployments on the Internet Computer mainnet
+
+See the [Getting Started](./docs/getting_started.md) guide for more details on network configuration.
+
 ## Quick Start
 
 ```bash
