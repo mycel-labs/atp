@@ -9,21 +9,11 @@ use crate::domain::models::signer::{Curve, SignatureAlgorithm};
 use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
 
-/*
-* dfx_test_key: Only available on the local replica started by dfx.
-* test_key_1: Test key available on the ICP mainnet.
-* key_1: Production key available on the ICP mainnet.
-*/
-pub const KEY_ID: &str = "dfx_test_key";
-// pub const KEY_ID: &str = "test_key_1";
-// pub const KEY_ID: &str = "key_1";
-
 // Initialize repositories for service
-fn init_repositories() -> (AccountRepositoryImpl, SignerRepositoryImpl) {
+fn get_repositories() -> (AccountRepositoryImpl, SignerRepositoryImpl) {
     // Create repository instances
-    let account_repository = AccountRepositoryImpl::new();
-    let signer_repository = SignerRepositoryImpl::new(KEY_ID.to_string());
-
+    let account_repository = AccountRepositoryImpl::global();
+    let signer_repository = SignerRepositoryImpl::global();
     (account_repository, signer_repository)
 }
 
@@ -37,7 +27,7 @@ pub async fn create_account(
     curve: Curve,
     approved_address: Principal,
 ) -> Result<AccountReply, String> {
-    let (account_repository, signer_repository) = init_repositories();
+    let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Use the caller as the owner
@@ -58,7 +48,7 @@ pub async fn create_account(
 /// The account must be in the Locked state.
 #[update]
 pub fn unlock_account(account_id: String) -> Result<AccountReply, String> {
-    let (account_repository, signer_repository) = init_repositories();
+    let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Unlock the account
@@ -74,7 +64,7 @@ pub fn unlock_account(account_id: String) -> Result<AccountReply, String> {
 /// The account must be in the Locked state.
 #[update]
 pub fn transfer_account(account_id: String, to: Principal) -> Result<AccountReply, String> {
-    let (account_repository, signer_repository) = init_repositories();
+    let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Transfer the account
@@ -90,7 +80,7 @@ pub fn transfer_account(account_id: String, to: Principal) -> Result<AccountRepl
 /// The account must be in the Unlocked state.
 #[update]
 pub fn activate_account(account_id: String) -> Result<AccountReply, String> {
-    let (account_repository, signer_repository) = init_repositories();
+    let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Activate the account
@@ -106,7 +96,7 @@ pub fn activate_account(account_id: String) -> Result<AccountReply, String> {
 /// Anyone can query account details.
 #[query]
 pub fn get_account(account_id: String) -> Result<AccountReply, String> {
-    let (account_repository, signer_repository) = init_repositories();
+    let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Get the account
@@ -122,7 +112,7 @@ pub fn get_account(account_id: String) -> Result<AccountReply, String> {
 /// The account must be in the Active state.
 #[update]
 pub async fn sign(account_id: String, message_hex: String) -> Result<String, String> {
-    let (account_repository, signer_repository) = init_repositories();
+    let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Sign the message
@@ -139,7 +129,7 @@ pub async fn sign_eip1559_transaction(
     account_id: String,
     tx_request: Eip1559TransactionRequestDTO,
 ) -> Result<String, String> {
-    let (account_repository, signer_repository) = init_repositories();
+    let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     let tx_request = Eip1559TransactionRequest::try_from(tx_request)?;
@@ -155,7 +145,7 @@ pub async fn sign_eip1559_transaction(
 /// Anyone can get the Ethereum address.
 #[query]
 pub fn get_eth_address(account_id: String) -> Result<String, String> {
-    let (account_repository, signer_repository) = init_repositories();
+    let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Generate Ethereum address

@@ -1,12 +1,35 @@
+use std::cell::RefCell;
+
 use crate::domain::models::account::Account;
 use crate::domain::repositories::account_repository::IAccountRepository;
 use crate::infrastructure::database::core::db_schema::ACCOUNTS_DB;
 
+thread_local! {
+    static ACCOUNT_REPOSITORY: RefCell<Option<AccountRepositoryImpl>> = RefCell::new(None);
+}
+
+#[derive(Clone)]
 pub struct AccountRepositoryImpl;
 
 impl AccountRepositoryImpl {
     pub fn new() -> Self {
         Self {}
+    }
+    /// Initialize the global account repository
+    pub fn init() {
+        ACCOUNT_REPOSITORY.with(|repo| {
+            *repo.borrow_mut() = Some(AccountRepositoryImpl {});
+        });
+    }
+
+    /// Get the global account repository instance
+    pub fn global() -> Self {
+        ACCOUNT_REPOSITORY.with(|repo| match &*repo.borrow() {
+            Some(instance) => instance.clone(),
+            None => panic!(
+                "AccountRepository not initialized! Call AccountRepositoryImpl::init() first."
+            ),
+        })
     }
 }
 
