@@ -142,6 +142,23 @@ This guide provides information for developers who want to contribute to the ATP
 - Be mindful of the size of messages passed between canisters
 - Consider batching operations when appropriate
 
+### Network Configuration
+
+When working with different networks (local, testnet, mainnet), you need to modify the key ID in the `src/atp/src/utils/config.rs` file:
+
+```rust
+// For local development with dfx replica
+pub const KEY_ID: &str = "dfx_test_key";
+
+// For testing on the Internet Computer mainnet
+// pub const KEY_ID: &str = "test_key_1";
+
+// For production deployments on the Internet Computer mainnet
+// pub const KEY_ID: &str = "key_1";
+```
+
+Uncomment the appropriate key ID based on the network you're targeting and comment out the others.
+
 ## Getting Help
 
 If you need help or have questions about contributing:

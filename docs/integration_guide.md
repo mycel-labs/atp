@@ -63,6 +63,12 @@ struct AccountReply {
 // ATP canister ID (replace with your actual canister ID)
 const ATP_CANISTER_ID: &str = "your_atp_canister_id";
 
+// Note: Make sure the ATP canister is using the correct key ID for your network
+// This is configured in the ATP canister's src/atp/src/utils/config.rs file:
+// - "dfx_test_key": For local development with dfx replica
+// - "test_key_1": For testing on the Internet Computer mainnet  
+// - "key_1": For production deployments on the Internet Computer mainnet
+
 #[ic_cdk::update]
 async fn create_and_transfer_account(to: Principal) -> Result<AccountReply, String> {
     // Step 1: Create an account
