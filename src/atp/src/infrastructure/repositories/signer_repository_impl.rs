@@ -4,6 +4,7 @@ use ethers_core::types::transaction::eip1559::Eip1559TransactionRequest;
 use ethers_core::types::Signature;
 use ethers_core::utils::{hex, keccak256};
 use serde::Serialize;
+use std::cell::RefCell;
 use std::future::Future;
 
 use crate::domain::models::signer::{Curve, SignatureAlgorithm};
@@ -70,6 +71,10 @@ pub struct EcdsaSignatureRequest {
     pub key_id: EcdsaKeyId,
 }
 
+thread_local! {
+    static SIGNER_REPOSITORY: RefCell<Option<SignerRepositoryImpl>> = RefCell::new(None);
+}
+#[derive(Clone)]
 pub struct SignerRepositoryImpl {
     key_id: String,
 }
@@ -77,6 +82,23 @@ pub struct SignerRepositoryImpl {
 impl SignerRepositoryImpl {
     pub fn new(key_id: String) -> Self {
         Self { key_id }
+    }
+
+    /// Initialize the global signer repository
+    pub fn init(key_id: String) {
+        SIGNER_REPOSITORY.with(|repo| {
+            *repo.borrow_mut() = Some(SignerRepositoryImpl { key_id });
+        });
+    }
+
+    /// Get the global signer repository instance
+    pub fn global() -> Self {
+        SIGNER_REPOSITORY.with(|repo| match &*repo.borrow() {
+            Some(instance) => instance.clone(),
+            None => {
+                panic!("SignerRepository not initialized! Call SignerRepositoryImpl::init() first.")
+            }
+        })
     }
 }
 
