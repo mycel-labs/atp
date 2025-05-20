@@ -29,7 +29,7 @@ impl Storable for AccountState {
     const BOUND: Bound = Bound::Unbounded;
 }
 
-#[derive(CandidType, Clone, Serialize, Deserialize)]
+#[derive(CandidType, Clone, Serialize, Deserialize, Debug)]
 pub struct Account {
     id: String,
     owner: Principal,

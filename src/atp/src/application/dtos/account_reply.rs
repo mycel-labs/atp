@@ -3,7 +3,7 @@ use crate::domain::models::signer::{Curve, SignatureAlgorithm};
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
 
-#[derive(CandidType, Clone, Serialize, Deserialize)]
+#[derive(CandidType, Clone, Serialize, Deserialize, Debug)]
 pub struct AccountReply {
     pub id: String,
     pub owner: String,

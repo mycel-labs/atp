@@ -95,7 +95,7 @@ impl AccountService {
         // Check if the account exists
         let mut account = self.account_repository.get(&account_id)?;
         // unlock the account
-        account.unlock()?;
+        account.activate()?;
         // update the account in the repository
         self.account_repository.insert(account.clone())
     }
@@ -112,6 +112,10 @@ impl AccountService {
         if account.account_state().clone() != AccountState::Active {
             return Err("Account is not activated".to_string());
         }
+        let message_bytes = match hex::decode(&message_hex) {
+            Ok(bytes) => bytes,
+            Err(_) => return Err("Invalid hex string".to_string()),
+        };
         // Check if the caller is the owner of the account
         if account.is_owner(ic_cdk::api::caller()) {
             let signature = self
@@ -119,7 +123,7 @@ impl AccountService {
                 .sign(
                     account.algorithm().clone(),
                     account.curve().clone(),
-                    hex::decode(message_hex).unwrap(),
+                    message_bytes,
                     account.id().clone(),
                 )
                 .await?;
