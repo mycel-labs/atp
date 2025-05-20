@@ -44,9 +44,9 @@ Accounts in ATP go through various state transitions:
 ```mermaid
 stateDiagram-v2
     [*] --> Locked: create_account
-    Locked --> Unlocked: transfer_account\n(by approved address)
-    Unlocked --> Active: activate_account\n(by owner)
-    Active --> Locked: approve_address\n(by owner)
+    Locked --> Unlocked: transfer_account (by approved address)
+    Unlocked --> Active: activate_account (by owner)
+    Active --> Locked: approve_address (by owner)
 ```
 
 ## Key Endpoints
@@ -60,7 +60,6 @@ stateDiagram-v2
 For more details, see the [API Reference](./docs/api_reference.md).
 
 ## Resources
-
 - [Internet Computer Documentation](https://internetcomputer.org/docs)
 - [Rust Canister Development Guide](https://internetcomputer.org/docs/current/developer-docs/backend/rust/)
 - [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
