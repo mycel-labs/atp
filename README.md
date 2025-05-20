@@ -17,7 +17,8 @@ For detailed documentation, see the following:
 - [Architecture](./docs/architecture.md) - Implementation details and state transitions
 - [API Reference](./docs/api_reference.md) - Endpoint documentation
 - [Getting Started](./docs/getting_started.md) - Setup and testing guide
-- [Integration Guide](./docs/integration_guide.md) - How to integrate with other canisters and use cases
+- [Integration Guide](./docs/integration_guide.md) - How to integrate with other canisters
+- [Contribution Guide](./docs/contribution_guide.md) - How to contribute to ATP
 
 ## Quick Start
 
