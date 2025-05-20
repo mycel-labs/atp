@@ -9,10 +9,14 @@ This guide provides information for developers who want to contribute to the ATP
    - [Rust](https://www.rust-lang.org/tools/install)
    - [Git](https://git-scm.com/downloads)
 
-2. **Clone the Repository**
+2. **Fork and Clone the Repository**
    ```bash
-   git clone https://github.com/mycel-labs/atp.git
+   # Fork the repository on GitHub first
+   # Then clone your fork
+   git clone https://github.com/YOUR_USERNAME/atp.git
    cd atp
+   # Add the original repository as upstream
+   git remote add upstream https://github.com/mycel-labs/atp.git
    ```
 
 3. **Install Dependencies**
@@ -83,12 +87,13 @@ This guide provides information for developers who want to contribute to the ATP
 
 7. **Push Your Changes**
    ```bash
-   git push origin feature/your-feature-name
+   git push -u origin feature/your-feature-name
    ```
 
 8. **Create a Pull Request**
-   - Go to the GitHub repository
-   - Create a new pull request from your feature branch to `develop`
+   - Go to your fork on GitHub
+   - Click "Compare & pull request"
+   - Create a new pull request from your fork's feature branch to the original repository's `develop` branch
    - Fill in the PR template with details about your changes
 
 ## Code Standards
