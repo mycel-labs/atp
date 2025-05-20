@@ -12,3 +12,19 @@ crate-type = ["cdylib"]
 candid = "0.10"
 ic-cdk = "0.17"
 ic-cdk-timers = "0.11" # Feel free to remove this dependency if you don't need timers
+ethers-core = "2.0.14"
+getrandom = { version = "0.2.15", features = ["custom"] }
+hex = "0.4.3"
+ic-stable-structures = "0.6.7"
+k256 = { version = "0.13.4", features = ["ecdsa"] }
+serde = "1.0.215"
+serde_json = "1.0.133"
+sha3 = "0.10.8"
+ic-web3 = "0.1.7"
+bs58 = "0.5.0"
+
+[dev-dependencies]
+tokio = { version = "1.41.1", features = ["full"] }
+ic-cdk-macros = "0.6"
+serde = { version = "1.0", features = ["derive"] }
+
