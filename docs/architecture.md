@@ -53,7 +53,7 @@ Accounts in ATP go through various state transitions during their lifecycle:
 ```mermaid
 stateDiagram-v2
     [*] --> Locked: create_account
-    Locked --> Unlocked: transfer_account\n(by approved address)
-    Unlocked --> Active: activate_account\n(by owner)
-    Active --> Locked: approve_address\n(by owner)
+    Locked --> Unlocked: transfer_account (by approved address)
+    Unlocked --> Active: activate_account (by owner)
+    Active --> Locked: approve_address (by owner)
 ```
