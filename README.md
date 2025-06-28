@@ -34,6 +34,11 @@ See the [Getting Started](./docs/getting_started.md) guide for more details on n
 # Install the DFINITY SDK if you haven't already
 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 
+or
+
+curl -fsSL --http1.1 https://internetcomputer.org/install.sh | sh
+
+
 # Clone the repository
 git clone https://github.com/mycel-labs/atp
 cd atp
