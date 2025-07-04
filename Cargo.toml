@@ -1,5 +1,9 @@
 [workspace]
 members = [
-    "src/atp"
+    "src/atp",
+    "packages/ic-nosql"
 ]
 resolver = "2"
+
+[workspace.dependencies]
+ic-nosql = { path = "packages/ic-nosql" }

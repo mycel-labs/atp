@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Stable Structures"><title>ic_stable_structures - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="ic_stable_structures" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0-nightly (f26e58023 2025-06-30)" data-channel="nightly" data-search-js="search-179e01a3.js" data-settings-js="settings-5514c975.js" ><script src="../static.files/storage-4e99c027.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-340f468f.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../ic_stable_structures/index.html">ic_<wbr>stable_<wbr>structures</a><span class="version">0.6.8</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#stable-structures" title="Stable Structures">Stable Structures</a><ul><li><a href="#background" title="Background">Background</a></li><li><a href="#available-data-structures" title="Available Data Structures">Available Data Structures</a></li><li><a href="#tutorials" title="Tutorials">Tutorials</a></li><li><a href="#how-it-works" title="How it Works">How it Works</a></li><li><a href="#example-canister" title="Example Canister">Example Canister</a></li><li><a href="#combined-persistence" title="Combined Persistence">Combined Persistence</a></li><li><a href="#fuzzing" title="Fuzzing">Fuzzing</a></li></ul></li></ul><h3><a href="#reexports">Crate Items</a></h3><ul class="block"><li><a href="#reexports" title="Re-exports">Re-exports</a></li><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#constants" title="Constants">Constants</a></li><li><a href="#traits" title="Traits">Traits</a></li><li><a href="#types" title="Type Aliases">Type Aliases</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>ic_stable_structures</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/ic_stable_structures/lib.rs.html#1-282">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>
+  <a href="https://crates.io/crates/ic-stable-structures"><img alt="Crate Info" src="https://img.shields.io/crates/v/ic-stable-structures.svg"/></a>
+  <a href="https://github.com/dfinity/stable-structures/blob/master/LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/dfinity/stable-structures"/></a>
+  <a href="https://docs.rs/ic-stable-structures"><img alt="API Docs" src="https://img.shields.io/badge/docs.rs-ic--stable--structures-blue"/></a>
+  <a href="https://forum.dfinity.org/"><img alt="Chat on the Forum" src="https://img.shields.io/badge/help-post%20on%20forum.dfinity.org-blue"></a>
+</p>
+<h2 id="stable-structures"><a class="doc-anchor" href="#stable-structures">§</a>Stable Structures</h2>
+<p>A collection of scalable data structures for the <a href="https://internetcomputer.org">Internet Computer</a> that persist across upgrades.</p>
+<p>Stable structures are designed to use stable memory as the backing store, allowing them to grow to gigabytes in size without the need for <code>pre_upgrade</code>/<code>post_upgrade</code> hooks.</p>
+<h3 id="background"><a class="doc-anchor" href="#background">§</a>Background</h3>
+<p>The conventional approach to canister state persistence is to serialize the entire state to stable memory in the <code>pre_upgrade</code> hook and decode it back in the <code>post_upgrade</code> hook.
+This approach is easy to implement and works well for relatively small datasets.
+Unfortunately, it does not scale well and can render a canister non-upgradable.</p>
+<p>This library aims to simplify managing data structures directly in stable memory.
+For more information about the philosophy behind the library, see <a href="https://mmapped.blog/posts/14-stable-structures.html">Roman’s tutorial on stable structures</a>.</p>
+<h3 id="available-data-structures"><a class="doc-anchor" href="#available-data-structures">§</a>Available Data Structures</h3>
+<ul>
+<li><a href="btreemap/struct.BTreeMap.html" title="struct ic_stable_structures::btreemap::BTreeMap">BTreeMap</a>: A Key-Value store</li>
+<li><a href="vec/struct.Vec.html" title="struct ic_stable_structures::vec::Vec">Vec</a>: A growable array</li>
+<li><a href="log/struct.Log.html" title="struct ic_stable_structures::log::Log">Log</a>: An append-only list of variable-size entries</li>
+<li><a href="cell/struct.Cell.html" title="struct ic_stable_structures::cell::Cell">Cell</a>: A serializable value</li>
+<li><a href="min_heap/struct.MinHeap.html" title="struct ic_stable_structures::min_heap::MinHeap">MinHeap</a>: A priority queue.</li>
+</ul>
+<h3 id="tutorials"><a class="doc-anchor" href="#tutorials">§</a>Tutorials</h3>
+<p><a href="./docs/schema-upgrades.md">Schema Upgrades</a></p>
+<h3 id="how-it-works"><a class="doc-anchor" href="#how-it-works">§</a>How it Works</h3>
+<p>Stable structures are able to work directly in stable memory because each data structure manages
+its own memory.
+When initializing a stable structure, a memory is provided that the data structure can use to store its data.</p>
+<p>Here’s a basic example:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ic_stable_structures::{BTreeMap, DefaultMemoryImpl};
+<span class="kw">let </span><span class="kw-2">mut </span>map: BTreeMap&lt;u64, u64, <span class="kw">_</span>&gt; = BTreeMap::init(DefaultMemoryImpl::default());
+
+map.insert(<span class="number">1</span>, <span class="number">2</span>);
+<span class="macro">assert_eq!</span>(map.get(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));</code></pre></div>
+<p>Memories are abstracted with the <a href="trait.Memory.html" title="trait ic_stable_structures::Memory">Memory</a> trait, and stable structures can work with any storage
+backend that implements this trait.
+This includes stable memory, a vector (<a href="vec_mem/type.VectorMemory.html" title="type ic_stable_structures::vec_mem::VectorMemory">VectorMemory</a>), or even a flat file (<a href="file_mem/struct.FileMemory.html" title="struct ic_stable_structures::file_mem::FileMemory">FileMemory</a>).</p>
+<p>The example above initializes a <a href="btreemap/struct.BTreeMap.html" title="struct ic_stable_structures::btreemap::BTreeMap">BTreeMap</a> with a <a href="type.DefaultMemoryImpl.html" title="type ic_stable_structures::DefaultMemoryImpl">DefaultMemoryImpl</a>, which maps to stable memory when used in a canister and to a <a href="vec_mem/type.VectorMemory.html" title="type ic_stable_structures::vec_mem::VectorMemory">VectorMemory</a> otherwise.</p>
+<p>Note that <strong>stable structures cannot share memories.</strong>
+Each memory must belong to only one stable structure.
+For example, this fails when run in a canister:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ic_stable_structures::{BTreeMap, DefaultMemoryImpl};
+<span class="kw">let </span><span class="kw-2">mut </span>map_1: BTreeMap&lt;u64, u64, <span class="kw">_</span>&gt; = BTreeMap::init(DefaultMemoryImpl::default());
+<span class="kw">let </span><span class="kw-2">mut </span>map_2: BTreeMap&lt;u64, u64, <span class="kw">_</span>&gt; = BTreeMap::init(DefaultMemoryImpl::default());
+
+map_1.insert(<span class="number">1</span>, <span class="number">2</span>);
+map_2.insert(<span class="number">1</span>, <span class="number">3</span>);
+<span class="macro">assert_eq!</span>(map_1.get(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)); <span class="comment">// This assertion fails.</span></code></pre></div>
+<p>It fails because both <code>map_1</code> and <code>map_2</code> are using the same stable memory under the hood, and so changes in <code>map_1</code> end up changing or corrupting <code>map_2</code>.</p>
+<p>To address this issue, we make use of the <a href="memory_manager/struct.MemoryManager.html" title="struct ic_stable_structures::memory_manager::MemoryManager">MemoryManager</a>, which takes a single memory and creates up to 255 virtual memories for our disposal.
+Here’s the above failing example, but fixed by using the <a href="memory_manager/struct.MemoryManager.html" title="struct ic_stable_structures::memory_manager::MemoryManager">MemoryManager</a>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ic_stable_structures::{
+   memory_manager::{MemoryId, MemoryManager},
+   BTreeMap, DefaultMemoryImpl,
+};
+<span class="kw">let </span>mem_mgr = MemoryManager::init(DefaultMemoryImpl::default());
+<span class="kw">let </span><span class="kw-2">mut </span>map_1: BTreeMap&lt;u64, u64, <span class="kw">_</span>&gt; = BTreeMap::init(mem_mgr.get(MemoryId::new(<span class="number">0</span>)));
+<span class="kw">let </span><span class="kw-2">mut </span>map_2: BTreeMap&lt;u64, u64, <span class="kw">_</span>&gt; = BTreeMap::init(mem_mgr.get(MemoryId::new(<span class="number">1</span>)));
+
+map_1.insert(<span class="number">1</span>, <span class="number">2</span>);
+map_2.insert(<span class="number">1</span>, <span class="number">3</span>);
+<span class="macro">assert_eq!</span>(map_1.get(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)); <span class="comment">// Succeeds, as expected.</span></code></pre></div>
+<h3 id="example-canister"><a class="doc-anchor" href="#example-canister">§</a>Example Canister</h3>
+<p>Here’s a fully working canister example that ties everything together.</p>
+<p>Dependencies:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+ic-cdk = &quot;0.6.8&quot;
+ic-cdk-macros = &quot;0.6.8&quot;
+ic-stable-structures = &quot;0.5.6&quot;</code></pre></div>
+<p>Code:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
+<span class="kw">use </span>ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
+<span class="kw">use </span>std::cell::RefCell;
+
+<span class="kw">type </span>Memory = VirtualMemory&lt;DefaultMemoryImpl&gt;;
+
+<span class="macro">thread_local!</span> {
+    <span class="comment">// The memory manager is used for simulating multiple memories. Given a `MemoryId` it can
+    // return a memory that can be used by stable structures.
+    </span><span class="kw">static </span>MEMORY_MANAGER: RefCell&lt;MemoryManager&lt;DefaultMemoryImpl&gt;&gt; =
+        RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
+
+    <span class="comment">// Initialize a `StableBTreeMap` with `MemoryId(0)`.
+    </span><span class="kw">static </span>MAP: RefCell&lt;StableBTreeMap&lt;u128, u128, Memory&gt;&gt; = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(<span class="number">0</span>))),
+        )
+    );
+}
+
+<span class="comment">// Retrieves the value associated with the given key if it exists.
+</span><span class="attr">#[ic_cdk_macros::query]
+</span><span class="kw">fn </span>get(key: u128) -&gt; <span class="prelude-ty">Option</span>&lt;u128&gt; {
+    MAP.with(|p| p.borrow().get(<span class="kw-2">&amp;</span>key))
+}
+
+<span class="comment">// Inserts an entry into the map and returns the previous value of the key if it exists.
+</span><span class="attr">#[ic_cdk_macros::update]
+</span><span class="kw">fn </span>insert(key: u128, value: u128) -&gt; <span class="prelude-ty">Option</span>&lt;u128&gt; {
+    MAP.with(|p| p.borrow_mut().insert(key, value))
+}</code></pre></div>
+<h4 id="more-examples"><a class="doc-anchor" href="#more-examples">§</a>More Examples</h4>
+<ul>
+<li><a href="https://github.com/dfinity/stable-structures/tree/main/examples/src/basic_example">Basic Example</a> (the one above)</li>
+<li><a href="https://github.com/dfinity/stable-structures/tree/main/examples/src/quick_start">Quickstart Example</a>: Ideal as a template when developing a new canister</li>
+<li><a href="https://github.com/dfinity/stable-structures/tree/main/examples/src/custom_types_example">Custom Types Example</a>: Showcases storing your own custom types</li>
+</ul>
+<h3 id="combined-persistence"><a class="doc-anchor" href="#combined-persistence">§</a>Combined Persistence</h3>
+<p>If your project exclusively relies on stable structures, the memory can expand in size without the requirement of <code>pre_upgrade</code>/<code>post_upgrade</code> hooks.</p>
+<p>However, it’s important to note that if you also intend to perform serialization/deserialization of the heap data, utilizing the memory manager becomes necessary. To effectively combine both approaches, refer to the <a href="https://github.com/dfinity/stable-structures/tree/main/examples/src/quick_start">Quickstart Example</a> for guidance.</p>
+<h3 id="fuzzing"><a class="doc-anchor" href="#fuzzing">§</a>Fuzzing</h3>
+<p>Stable structures requires strong guarantees to work reliably and scale over millions of operations. To that extent, we use fuzzing to emulate such operations on the available data structures.</p>
+<p>To run a fuzzer locally,</p>
+<div class="example-wrap"><pre class="language-sh"><code>rustup toolchain install nightly
+cargo install cargo-fuzz
+
+# To list available fuzzer targets
+cargo +nightly fuzz list
+
+# To run a target 
+cargo +nightly fuzz run &lt;TARGET_NAME&gt;</code></pre></div></div></details><h2 id="reexports" class="section-header">Re-exports<a href="#reexports" class="anchor">§</a></h2><dl class="item-table reexports"><dt id="reexport.StableCell"><code>pub use cell::<a class="struct" href="cell/struct.Cell.html" title="struct ic_stable_structures::cell::Cell">Cell</a> as StableCell;</code></dt><dt id="reexport.Cell"><code>pub use cell::<a class="struct" href="cell/struct.Cell.html" title="struct ic_stable_structures::cell::Cell">Cell</a>;</code></dt><dt id="reexport.StableLog"><code>pub use log::<a class="struct" href="log/struct.Log.html" title="struct ic_stable_structures::log::Log">Log</a> as StableLog;</code></dt><dt id="reexport.Log"><code>pub use log::<a class="struct" href="log/struct.Log.html" title="struct ic_stable_structures::log::Log">Log</a>;</code></dt><dt id="reexport.MinHeap"><code>pub use min_heap::<a class="struct" href="min_heap/struct.MinHeap.html" title="struct ic_stable_structures::min_heap::MinHeap">MinHeap</a>;</code></dt><dt id="reexport.StableMinHeap"><code>pub use min_heap::<a class="struct" href="min_heap/struct.MinHeap.html" title="struct ic_stable_structures::min_heap::MinHeap">MinHeap</a> as StableMinHeap;</code></dt><dt id="reexport.StableVec"><code>pub use vec::<a class="struct" href="vec/struct.Vec.html" title="struct ic_stable_structures::vec::Vec">Vec</a> as StableVec;</code></dt><dt id="reexport.Vec"><code>pub use vec::<a class="struct" href="vec/struct.Vec.html" title="struct ic_stable_structures::vec::Vec">Vec</a>;</code></dt><dt id="reexport.BTreeMap"><code>pub use btreemap::<a class="struct" href="btreemap/struct.BTreeMap.html" title="struct ic_stable_structures::btreemap::BTreeMap">BTreeMap</a>;</code></dt><dt id="reexport.StableBTreeMap"><code>pub use btreemap::<a class="struct" href="btreemap/struct.BTreeMap.html" title="struct ic_stable_structures::btreemap::BTreeMap">BTreeMap</a> as StableBTreeMap;</code></dt><dt id="reexport.FileMemory"><code>pub use file_mem::<a class="struct" href="file_mem/struct.FileMemory.html" title="struct ic_stable_structures::file_mem::FileMemory">FileMemory</a>;</code></dt><dt id="reexport.Storable"><code>pub use storable::<a class="trait" href="storable/trait.Storable.html" title="trait ic_stable_structures::storable::Storable">Storable</a>;</code></dt><dt id="reexport.VectorMemory"><code>pub use vec_mem::<a class="type" href="vec_mem/type.VectorMemory.html" title="type ic_stable_structures::vec_mem::VectorMemory">VectorMemory</a>;</code></dt></dl><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="btreemap/index.html" title="mod ic_stable_structures::btreemap">btreemap</a></dt><dd>This module implements a key/value store based on a B-Tree
+in stable memory.</dd><dt><a class="mod" href="cell/index.html" title="mod ic_stable_structures::cell">cell</a></dt><dd>A serializable value stored in the stable memory.</dd><dt><a class="mod" href="file_mem/index.html" title="mod ic_stable_structures::file_mem">file_<wbr>mem</a></dt><dt><a class="mod" href="log/index.html" title="mod ic_stable_structures::log">log</a></dt><dd>An append-only list data structure, also known as log.</dd><dt><a class="mod" href="memory_manager/index.html" title="mod ic_stable_structures::memory_manager">memory_<wbr>manager</a></dt><dd>A module for simulating multiple memories within a single memory.</dd><dt><a class="mod" href="min_heap/index.html" title="mod ic_stable_structures::min_heap">min_<wbr>heap</a></dt><dt><a class="mod" href="reader/index.html" title="mod ic_stable_structures::reader">reader</a></dt><dt><a class="mod" href="storable/index.html" title="mod ic_stable_structures::storable">storable</a></dt><dt><a class="mod" href="vec/index.html" title="mod ic_stable_structures::vec">vec</a></dt><dd>This module implements a growable array in stable memory.</dd><dt><a class="mod" href="vec_mem/index.html" title="mod ic_stable_structures::vec_mem">vec_mem</a></dt><dt><a class="mod" href="writer/index.html" title="mod ic_stable_structures::writer">writer</a></dt></dl><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.GrowFailed.html" title="struct ic_stable_structures::GrowFailed">Grow<wbr>Failed</a></dt><dt><a class="struct" href="struct.RestrictedMemory.html" title="struct ic_stable_structures::RestrictedMemory">Restricted<wbr>Memory</a></dt><dd>RestrictedMemory creates a limited view of another memory.  This
+allows one to divide the main memory into non-intersecting ranges
+and use different layouts in each region.</dd></dl><h2 id="constants" class="section-header">Constants<a href="#constants" class="anchor">§</a></h2><dl class="item-table"><dt><a class="constant" href="constant.MAX_PAGES.html" title="constant ic_stable_structures::MAX_PAGES">MAX_<wbr>PAGES</a></dt><dd>The maximum number of stable memory pages a canister can address.</dd></dl><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.Memory.html" title="trait ic_stable_structures::Memory">Memory</a></dt></dl><h2 id="types" class="section-header">Type Aliases<a href="#types" class="anchor">§</a></h2><dl class="item-table"><dt><a class="type" href="type.DefaultMemoryImpl.html" title="type ic_stable_structures::DefaultMemoryImpl">Default<wbr>Memory<wbr>Impl</a></dt></dl></section></div></main></body></html>

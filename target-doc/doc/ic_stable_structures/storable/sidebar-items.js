@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Bound"],"struct":["Blob","TryFromSliceError"],"trait":["Storable"]};

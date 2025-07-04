@@ -1066,6 +1066,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ic-nosql"
+version = "0.1.0"
+dependencies = [
+ "candid 0.10.14",
+ "ic-stable-structures",
+ "serde",
+]
+
+[[package]]
 name = "ic-stable-structures"
 version = "0.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"

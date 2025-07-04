@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MAX_PAGES"],"mod":["btreemap","cell","file_mem","log","memory_manager","min_heap","reader","storable","vec","vec_mem","writer"],"struct":["GrowFailed","RestrictedMemory"],"trait":["Memory"],"type":["DefaultMemoryImpl"]};
