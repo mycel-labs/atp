@@ -44,7 +44,7 @@ thread_local! {
 fn init() {
     DB_MANAGER.with(|db| {
         let db = db.borrow();
-        
+
         // Register models with specific memory ranges
         db.register_model("users", Some(10), None)
             .expect("Failed to register users model");
@@ -72,16 +72,18 @@ fn post_upgrade() {
 #[update]
 async fn create_user(username: String, email: String) -> Result<User, String> {
     // Generate a simple ID (in production, use a proper ID generation strategy)
-    let random_bytes = raw_rand().await.map_err(|e| format!("Failed to generate random bytes: {:?}", e))?;
+    let random_bytes = raw_rand()
+        .await
+        .map_err(|e| format!("Failed to generate random bytes: {:?}", e))?;
     let id = format!("user_{}", hex::encode(&random_bytes.0[..8]));
-    
+
     let user = User {
         id: id.clone(),
         username,
         email,
         created_at: ic_cdk::api::time(),
     };
-    
+
     DB_MANAGER.with(|db| {
         let db = db.borrow();
         db.insert("users", &id, &user)?;
@@ -111,11 +113,13 @@ fn list_users(page: usize, size: usize) -> Result<Vec<User>, String> {
 async fn create_post(user_id: String, title: String, content: String) -> Result<Post, String> {
     // Verify user exists
     let _user = get_user(user_id.clone())?;
-    
+
     // Generate post ID
-    let random_bytes = raw_rand().await.map_err(|e| format!("Failed to generate random bytes: {:?}", e))?;
+    let random_bytes = raw_rand()
+        .await
+        .map_err(|e| format!("Failed to generate random bytes: {:?}", e))?;
     let id = format!("post_{}", hex::encode(&random_bytes.0[..8]));
-    
+
     let post = Post {
         id: id.clone(),
         user_id,
@@ -123,7 +127,7 @@ async fn create_post(user_id: String, title: String, content: String) -> Result<
         content,
         created_at: ic_cdk::api::time(),
     };
-    
+
     DB_MANAGER.with(|db| {
         let db = db.borrow();
         db.insert("posts", &id, &post)?;
@@ -150,15 +154,21 @@ fn list_posts(page: usize, size: usize) -> Result<Vec<Post>, String> {
 
 // Comment management functions
 #[update]
-async fn create_comment(post_id: String, user_id: String, content: String) -> Result<Comment, String> {
+async fn create_comment(
+    post_id: String,
+    user_id: String,
+    content: String,
+) -> Result<Comment, String> {
     // Verify post and user exist
     let _post = get_post(post_id.clone())?;
     let _user = get_user(user_id.clone())?;
-    
+
     // Generate comment ID
-    let random_bytes = raw_rand().await.map_err(|e| format!("Failed to generate random bytes: {:?}", e))?;
+    let random_bytes = raw_rand()
+        .await
+        .map_err(|e| format!("Failed to generate random bytes: {:?}", e))?;
     let id = format!("comment_{}", hex::encode(&random_bytes.0[..8]));
-    
+
     let comment = Comment {
         id: id.clone(),
         post_id,
@@ -166,7 +176,7 @@ async fn create_comment(post_id: String, user_id: String, content: String) -> Re
         content,
         created_at: ic_cdk::api::time(),
     };
-    
+
     DB_MANAGER.with(|db| {
         let db = db.borrow();
         db.insert("comments", &id, &comment)?;

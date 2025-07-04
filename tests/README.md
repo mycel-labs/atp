@@ -73,23 +73,10 @@ The example canister demonstrates how to use ic-nosql in a real Internet Compute
    cargo build --package example-canister --target wasm32-unknown-unknown --release
    ```
 
-3. **Run integration tests**:
+3. **Run stress tests**:
    ```bash
-    cargo test --package ic-nosql-tests --test integration_tests
+    cargo test --package ic-nosql-tests --test stress_tests
    ```
-
-## Test Coverage
-
-The integration tests cover:
-
-- ✅ **Basic Functionality**: Health checks and database stats
-- ✅ **User Management**: Create, retrieve, and list users
-- ✅ **Post Management**: Create posts linked to users
-- ✅ **Comment Management**: Create comments linked to posts and users
-- ✅ **Data Persistence**: Verify data survives canister upgrades
-- ✅ **Concurrent Operations**: Multiple operations in sequence
-- ✅ **Error Handling**: Invalid operations and edge cases
-
 ## Memory Layout
 
 The example canister uses the following memory layout:
@@ -150,24 +137,6 @@ let users: Vec<User> = response.results.into_iter().map(|doc| doc.data).collect(
 - Use `ic_cdk::println!` for debugging in the canister
 - Check the generated Candid interface for type mismatches
 - Verify memory layout doesn't conflict with other storage systems
-
-## Performance Considerations
-
-The example canister is designed for demonstration purposes. For production use, consider:
-
-- **Batch Operations**: Implement batch insert/update operations
-- **Caching**: Add caching for frequently accessed data
-- **Indexing**: Use secondary indexes for complex queries
-- **Memory Optimization**: Optimize memory usage for large datasets
-
-## Contributing
-
-To add new tests or improve the example canister:
-
-1. Add new test functions to `integration_tests.rs`
-2. Update the example canister in `example-canister/src/lib.rs`
-3. Update the Candid interface in `example-canister.did`
-4. Run the test suite to ensure everything works
 
 ## References
 
