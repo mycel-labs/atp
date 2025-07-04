@@ -1,0 +1,73 @@
+type User = record {
+    id: text;
+    username: text;
+    email: text;
+    created_at: nat64;
+};
+
+type Post = record {
+    id: text;
+    user_id: text;
+    title: text;
+    content: text;
+    created_at: nat64;
+};
+
+type Comment = record {
+    id: text;
+    post_id: text;
+    user_id: text;
+    content: text;
+    created_at: nat64;
+};
+
+type Result_User = variant {
+    Ok: User;
+    Err: text;
+};
+
+type Result_Post = variant {
+    Ok: Post;
+    Err: text;
+};
+
+type Result_Comment = variant {
+    Ok: Comment;
+    Err: text;
+};
+
+type Result_Users = variant {
+    Ok: vec User;
+    Err: text;
+};
+
+type Result_Posts = variant {
+    Ok: vec Post;
+    Err: text;
+};
+
+type Result_Comments = variant {
+    Ok: vec Comment;
+    Err: text;
+};
+
+service : {
+    // User management
+    create_user: (text, text) -> (Result_User);
+    get_user: (text) -> (Result_User) query;
+    list_users: (nat, nat) -> (Result_Users) query;
+    
+    // Post management
+    create_post: (text, text, text) -> (Result_Post);
+    get_post: (text) -> (Result_Post) query;
+    list_posts: (nat, nat) -> (Result_Posts) query;
+    
+    // Comment management
+    create_comment: (text, text, text) -> (Result_Comment);
+    get_comment: (text) -> (Result_Comment) query;
+    list_comments: (nat, nat) -> (Result_Comments) query;
+    
+    // Utilities
+    get_database_stats: () -> (vec text) query;
+    health_check: () -> (text) query;
+}
