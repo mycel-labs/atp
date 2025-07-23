@@ -1,7 +1,7 @@
 use ic_cdk::api::time;
 use ic_cdk::{heartbeat, init, post_upgrade, pre_upgrade};
 
-use crate::infrastructure::repositories::account_repository_nosql::AccountRepositoryNosql;
+use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
 use crate::utils::config::KEY_ID;
 
@@ -13,7 +13,7 @@ fn init() {
 
     // Initialize the repositories
     SignerRepositoryImpl::init(KEY_ID.to_string());
-    AccountRepositoryNosql::init().expect("Failed to initialize account repository");
+    AccountRepositoryImpl::init().expect("Failed to initialize account repository");
 
     ic_cdk::println!("[{}] Canister initialized successfully", time());
 }
@@ -44,7 +44,7 @@ fn post_upgrade() {
 
     // Re-initialize the repositories
     SignerRepositoryImpl::init(KEY_ID.to_string());
-    AccountRepositoryNosql::init().expect("Failed to initialize account repository");
+    AccountRepositoryImpl::init().expect("Failed to initialize account repository");
 
     // If you saved any additional data in pre_upgrade, restore it here
     //

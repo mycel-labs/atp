@@ -6,13 +6,13 @@ use crate::application::dtos::account_reply::AccountReply;
 use crate::application::dtos::eip1559::Eip1559TransactionRequestDTO;
 use crate::application::services::account_service::AccountService;
 use crate::domain::models::signer::{Curve, SignatureAlgorithm};
-use crate::infrastructure::repositories::account_repository_nosql::AccountRepositoryNosql;
+use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
 
 // Initialize repositories for service
-fn get_repositories() -> (AccountRepositoryNosql, SignerRepositoryImpl) {
+fn get_repositories() -> (AccountRepositoryImpl, SignerRepositoryImpl) {
     // Create repository instances
-    let account_repository = AccountRepositoryNosql::global();
+    let account_repository = AccountRepositoryImpl::global();
     let signer_repository = SignerRepositoryImpl::global();
     (account_repository, signer_repository)
 }

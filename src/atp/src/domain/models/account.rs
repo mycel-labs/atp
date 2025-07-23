@@ -1,8 +1,8 @@
 use candid::{CandidType, Decode, Encode, Principal};
+use ic_nosql::traits::Model;
 use ic_stable_structures::{storable::Bound, Storable};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
-use ic_nosql::traits::Model;
 
 use crate::domain::models::signer::{Curve, SignatureAlgorithm};
 use crate::generate_getters;

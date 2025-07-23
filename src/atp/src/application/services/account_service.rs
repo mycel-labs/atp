@@ -6,18 +6,18 @@ use crate::domain::models::account::{Account, AccountState};
 use crate::domain::models::signer::{Curve, SignatureAlgorithm};
 use crate::domain::repositories::account_repository::IAccountRepository;
 use crate::domain::repositories::signer_repository::ISignerRepository;
-use crate::infrastructure::repositories::account_repository_nosql::AccountRepositoryNosql;
+use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
 use crate::utils::eth_utils::{generate_eth_address_from_sec1, sha256};
 
 pub struct AccountService {
-    account_repository: AccountRepositoryNosql,
+    account_repository: AccountRepositoryImpl,
     signer_repository: SignerRepositoryImpl,
 }
 
 impl AccountService {
     pub fn new(
-        account_repository: AccountRepositoryNosql,
+        account_repository: AccountRepositoryImpl,
         signer_repository: SignerRepositoryImpl,
     ) -> Self {
         Self {
