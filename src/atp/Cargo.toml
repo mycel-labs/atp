@@ -26,5 +26,4 @@ bs58 = "0.5.0"
 [dev-dependencies]
 tokio = { version = "1.41.1", features = ["full"] }
 ic-cdk-macros = "0.6"
-serde = { version = "1.0", features = ["derive"] }
 

@@ -31,12 +31,15 @@ See the [Getting Started](./docs/getting_started.md) guide for more details on n
 ## Quick Start
 
 ```bash
-# Install the DFINITY SDK if you haven't already
-sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
-
 # Clone the repository
 git clone https://github.com/mycel-labs/atp
 cd atp
+
+
+# Install the DFINITY SDK if you haven't already
+sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
+## Or use nix-shell
+make nix-shell-env
 
 # Start the local Internet Computer replica
 dfx start --background
@@ -67,7 +70,8 @@ stateDiagram-v2
 
 For more details, see the [API Reference](./docs/api_reference.md).
 
-## Resources
+## Reference
 - [Internet Computer Documentation](https://internetcomputer.org/docs)
 - [Rust Canister Development Guide](https://internetcomputer.org/docs/current/developer-docs/backend/rust/)
 - [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
+- [ninegua/ic-nix](https://github.com/ninegua/ic-nix)

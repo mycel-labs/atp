@@ -151,3 +151,6 @@ pub fn get_eth_address(account_id: String) -> Result<String, String> {
     // Generate Ethereum address
     service.get_eth_address(account_id)
 }
+
+// Export the Candid interface
+ic_cdk::export_candid!();

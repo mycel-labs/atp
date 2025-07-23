@@ -4,8 +4,9 @@
 //! in a single canister with proper memory management.
 
 use ic_cdk::api::management_canister::main::raw_rand;
-use ic_cdk_macros::{init, post_upgrade, pre_upgrade, query, update};
-use ic_nosql::{CandidType, DatabaseManager, Deserialize, Serialize};
+use ic_cdk::{init, post_upgrade, pre_upgrade, query, update};
+use ic_nosql::{CandidType, DatabaseManager};
+use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 
 // Example models

@@ -838,8 +838,7 @@ version = "0.1.0"
 dependencies = [
  "candid 0.10.14",
  "hex",
- "ic-cdk 0.13.6",
- "ic-cdk-macros 0.13.2",
+ "ic-cdk 0.17.2",
  "ic-nosql",
  "serde",
 ]
@@ -1271,20 +1270,6 @@ dependencies = [
 
 [[package]]
 name = "ic-cdk"
-version = "0.13.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36c4f1eea1e5ca52801fbc8363cfb67c3218741afaa63fc001b80a0d283d60ca"
-dependencies = [
- "candid 0.10.14",
- "ic-cdk-executor",
- "ic-cdk-macros 0.13.2",
- "ic0 0.23.0",
- "serde",
- "serde_bytes",
-]
-
-[[package]]
-name = "ic-cdk"
 version = "0.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95a7344f41493cbf591f13ae9f90181076f808a83af799815c3074b19c693d2e"
@@ -1310,20 +1295,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebf50458685a0fc6b0e414cdba487610aeb199ac94db52d9fd76270565debee7"
 dependencies = [
  "candid 0.8.4",
- "proc-macro2",
- "quote",
- "serde",
- "serde_tokenstream 0.1.7",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "ic-cdk-macros"
-version = "0.13.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a45800053d80a6df839a71aaea5797e723188c0b992618208ca3b941350c7355"
-dependencies = [
- "candid 0.10.14",
  "proc-macro2",
  "quote",
  "serde",
@@ -1396,6 +1367,7 @@ name = "ic-nosql-tests"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.14",
+ "ic-nosql",
  "pocket-ic",
  "serde",
  "serde_json",

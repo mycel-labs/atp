@@ -1,69 +1,35 @@
-// Signature Algorithm Enum
-type SignatureAlgorithm = variant {
-  ecdsa;
-  schnorr;
-};
-
-// Curve Enum
-type Curve = variant {
-  secp256k1;
-  ed25519;
-};
-
-// Account State Enum
-type AccountState = variant {
-  locked;
-  unlocked;
-  active;
-};
-
-// Account Reply Type
 type AccountReply = record {
-  id: text;
-  owner: text;
-  public_key_hex: text;
-  algorithm: SignatureAlgorithm;
-  curve: Curve;
-  account_state: AccountState;
-  approved_address: text;
+  id : text;
+  algorithm : SignatureAlgorithm;
+  owner : text;
+  curve : Curve;
+  account_state : AccountState;
+  approved_address : text;
+  public_key_hex : text;
 };
-
-// EIP-1559 Transaction Request
+type AccountState = variant { active; locked; unlocked };
+type Curve = variant { secp256k1; ed25519 };
 type Eip1559TransactionRequestDTO = record {
-  to: opt text;
-  from: opt text;
-  nonce: opt text;
-  value: opt text;
-  gas: opt text;
-  max_priority_fee_per_gas: opt text;
-  max_fee_per_gas: opt text;
-  data: opt vec nat8;
-  chain_id: opt text;
+  to : opt text;
+  gas : opt text;
+  value : opt text;
+  max_priority_fee_per_gas : opt text;
+  data : opt blob;
+  from : opt text;
+  max_fee_per_gas : opt text;
+  chain_id : opt text;
+  nonce : opt text;
 };
-
+type Result = variant { Ok : AccountReply; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
+type SignatureAlgorithm = variant { ecdsa; schnorr };
 service : {
-  // Create a new account with the given parameters
-  create_account: (algorithm: SignatureAlgorithm, curve: Curve, approved_address: principal) -> (variant { Ok: AccountReply; Err: text; });
-  
-  // Unlock an account
-  unlock_account: (account_id: text) -> (variant { Ok: AccountReply; Err: text; });
-  
-  // Transfer an account
-  transfer_account: (account_id: text, to: principal) -> (variant { Ok: AccountReply; Err: text; });
-  
-  // Activate an account
-  activate_account: (account_id: text) -> (variant { Ok: AccountReply; Err: text; });
-  
-  // Get account details
-  get_account: (account_id: text) -> (variant { Ok: AccountReply; Err: text; }) query;
-  
-  // Sign a message with the account's private key
-  sign: (account_id: text, message_hex: text) -> (variant { Ok: text; Err: text; });
-  
-  // Sign an EIP-1559 transaction with the account's private key
-  sign_eip1559_transaction: (account_id: text, tx_request: Eip1559TransactionRequestDTO) -> (variant { Ok: text; Err: text; });
-  
-  // Get the Ethereum address derived from the account's public key
-  get_eth_address: (account_id: text) -> (variant { Ok: text; Err: text; }) query;
-};
-
+  activate_account : (text) -> (Result);
+  create_account : (SignatureAlgorithm, Curve, principal) -> (Result);
+  get_account : (text) -> (Result) query;
+  get_eth_address : (text) -> (Result_1) query;
+  sign : (text, text) -> (Result_1);
+  sign_eip1559_transaction : (text, Eip1559TransactionRequestDTO) -> (Result_1);
+  transfer_account : (text, principal) -> (Result);
+  unlock_account : (text) -> (Result);
+}
