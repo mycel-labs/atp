@@ -2,8 +2,8 @@
 members = [
     "src/atp",
     "packages/ic-nosql",
-    "tests/example-canister",
-    "tests"
+    "packages/ic-nosql/example-canister",
+    "packages/ic-nosql/tests"
 ]
 resolver = "2"
 

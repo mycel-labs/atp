@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-ic-nosql = { path = "../../packages/ic-nosql" }
+ic-nosql = { path = "../." }
 ic-cdk = "0.13"
 ic-cdk-macros = "0.13"
 candid = "0.10"
