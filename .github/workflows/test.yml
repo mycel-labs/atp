@@ -36,8 +36,8 @@ jobs:
       uses: dfinity/pocketic@main
       
     - name: Confirm PocketIC installation
-      run: "${POCKET_IC_BIN}" --version
-      
+      run: ${POCKET_IC_BIN} --version
+
     - name: Build
       run: cargo build --release 
         
