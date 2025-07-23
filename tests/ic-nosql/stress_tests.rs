@@ -4,14 +4,20 @@
 //! under moderate load with improved code organization and parallel processing.
 
 use candid::Encode;
-use ic_nosql_tests::*;
+use ic_nosql_tests::{
+    ic_nosql::{
+        create_example_canister_env, create_posts_batch, create_users_batch,
+        ExampleCanisterTestDataGenerator, User,
+    },
+    test_utils::{assert_success_rate, PerformanceMetrics},
+};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Instant;
 
 #[test]
 fn stress_test_create_many_users() -> Result<(), Box<dyn std::error::Error>> {
-    let env = TestEnvironment::new()?;
+    let env = create_example_canister_env()?;
     let mut metrics = PerformanceMetrics::new();
 
     const NUM_USERS: usize = 100;
@@ -20,7 +26,7 @@ fn stress_test_create_many_users() -> Result<(), Box<dyn std::error::Error>> {
     let start_time = Instant::now();
 
     for i in 0..NUM_USERS {
-        let (username, email) = TestDataGenerator::generate_user(i, "stress_user");
+        let (username, email) = ExampleCanisterTestDataGenerator::generate_user(i, "stress_user");
 
         let (duration, result) = env.timed_update_call::<Result<User, String>>(
             "create_user",
@@ -53,7 +59,7 @@ fn stress_test_create_many_users() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn stress_test_create_posts_with_users() -> Result<(), Box<dyn std::error::Error>> {
-    let env = TestEnvironment::new()?;
+    let env = create_example_canister_env()?;
 
     const NUM_USERS: usize = 10;
     const POSTS_PER_USER: usize = 5;
@@ -83,7 +89,7 @@ fn stress_test_create_posts_with_users() -> Result<(), Box<dyn std::error::Error
 
 #[test]
 fn stress_test_parallel_user_creation() -> Result<(), Box<dyn std::error::Error>> {
-    let env = Arc::new(TestEnvironment::new()?);
+    let env = Arc::new(create_example_canister_env()?);
 
     const NUM_THREADS: usize = 4;
     const USERS_PER_THREAD: usize = 25;
@@ -108,7 +114,7 @@ fn stress_test_parallel_user_creation() -> Result<(), Box<dyn std::error::Error>
             for i in 0..USERS_PER_THREAD {
                 let user_index = thread_id * USERS_PER_THREAD + i;
                 let (username, email) =
-                    TestDataGenerator::generate_user(user_index, "parallel_user");
+                    ExampleCanisterTestDataGenerator::generate_user(user_index, "parallel_user");
 
                 let start = Instant::now();
                 let result: Result<Result<User, String>, _> =
@@ -156,7 +162,7 @@ fn stress_test_parallel_user_creation() -> Result<(), Box<dyn std::error::Error>
 
 #[test]
 fn stress_test_parallel_mixed_operations() -> Result<(), Box<dyn std::error::Error>> {
-    let env = Arc::new(TestEnvironment::new()?);
+    let env = Arc::new(create_example_canister_env()?);
 
     const NUM_THREADS: usize = 3;
     const OPERATIONS_PER_THREAD: usize = 15;
@@ -187,8 +193,10 @@ fn stress_test_parallel_mixed_operations() -> Result<(), Box<dyn std::error::Err
                 // Mix of write and read operations
                 let (duration, success) = if i % 3 == 0 {
                     // Write operation: Create user
-                    let (username, email) =
-                        TestDataGenerator::generate_user(operation_index, "mixed_user");
+                    let (username, email) = ExampleCanisterTestDataGenerator::generate_user(
+                        operation_index,
+                        "mixed_user",
+                    );
                     let start = Instant::now();
                     let result: Result<Result<User, String>, _> =
                         env_clone.update_call("create_user", Encode!(&username, &email).unwrap());
@@ -267,7 +275,7 @@ fn stress_test_parallel_mixed_operations() -> Result<(), Box<dyn std::error::Err
 
 #[test]
 fn stress_test_concurrent_operations() -> Result<(), Box<dyn std::error::Error>> {
-    let env = TestEnvironment::new()?;
+    let env = create_example_canister_env()?;
     let mut write_metrics = PerformanceMetrics::new();
     let mut read_metrics = PerformanceMetrics::new();
 
@@ -282,7 +290,8 @@ fn stress_test_concurrent_operations() -> Result<(), Box<dyn std::error::Error>>
 
     for i in 0..NUM_ITERATIONS {
         // Write operation: Create user
-        let (username, email) = TestDataGenerator::generate_user(i, "concurrent_user");
+        let (username, email) =
+            ExampleCanisterTestDataGenerator::generate_user(i, "concurrent_user");
 
         let (duration, result) = env.timed_update_call::<Result<User, String>>(
             "create_user",
@@ -326,7 +335,7 @@ fn stress_test_concurrent_operations() -> Result<(), Box<dyn std::error::Error>>
 
 #[test]
 fn stress_test_pagination() -> Result<(), Box<dyn std::error::Error>> {
-    let env = TestEnvironment::new()?;
+    let env = create_example_canister_env()?;
 
     const NUM_USERS: usize = 25;
     const PAGE_SIZE: usize = 5;
@@ -384,7 +393,7 @@ fn stress_test_pagination() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn stress_test_canister_upgrade() -> Result<(), Box<dyn std::error::Error>> {
-    let env = TestEnvironment::new()?;
+    let env = create_example_canister_env()?;
 
     const NUM_USERS: usize = 5;
 
@@ -407,7 +416,7 @@ fn stress_test_canister_upgrade() -> Result<(), Box<dyn std::error::Error>> {
     println!("Verifying data integrity after upgrade...");
 
     // Verify users still exist
-    let verified_count = verify_entities_exist::<User>(&env, &user_ids, "get_user")?;
+    let verified_count = env.verify_entities_exist::<User>(&user_ids, "get_user")?;
 
     let total_duration = start_time.elapsed();
     println!("Total test execution time: {:?}", total_duration);

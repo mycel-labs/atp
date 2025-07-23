@@ -1,41 +1,16 @@
-//! Test utilities for ic-nosql stress tests
+//! Common test utilities for all canister tests
 //!
-//! This module provides common utilities, helper functions, and data structures
-//! used across all test files to reduce code duplication and improve maintainability.
+//! This module provides shared utilities, helper functions, and data structures
+//! used across all test files (ATP, ic-nosql, etc.) to reduce code duplication
+//! and improve maintainability.
 
 use candid::{CandidType, Decode, Deserialize, Encode, Principal};
-use serde::Serialize;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use pocket_ic::PocketIc;
 
-// Test data structures matching the canister
-#[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
-pub struct User {
-    pub id: String,
-    pub username: String,
-    pub email: String,
-    pub created_at: u64,
-}
-
-#[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
-pub struct Post {
-    pub id: String,
-    pub user_id: String,
-    pub title: String,
-    pub content: String,
-    pub created_at: u64,
-}
-
-#[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
-pub struct Comment {
-    pub id: String,
-    pub post_id: String,
-    pub user_id: String,
-    pub content: String,
-    pub created_at: u64,
-}
+// Common data structures and utilities for all canister tests
 
 // Performance metrics tracking
 #[derive(Debug, Default)]
@@ -153,20 +128,32 @@ pub struct TestEnvironment {
     pub pic: PocketIc,
     pub canister_id: Principal,
     pub config: TestConfig,
+    pub canister_name: String,
 }
 
 impl TestEnvironment {
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        Self::with_config(TestConfig::default())
+    pub fn new(
+        package_name: &str,
+        canister_name: &str,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::new_with_config(package_name, canister_name, TestConfig::default())
     }
 
-    pub fn with_config(config: TestConfig) -> Result<Self, Box<dyn std::error::Error>> {
-        ensure_canister_built()?;
+    pub fn new_with_config(
+        package_name: &str,
+        canister_name: &str,
+        config: TestConfig,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        ensure_canister_built(package_name, canister_name)?;
 
         let pic = PocketIc::new();
-        let wasm_path = get_canister_wasm_path();
-        let wasm_bytes = std::fs::read(&wasm_path)
-            .map_err(|e| format!("Failed to read canister WASM at {:?}: {}", wasm_path, e))?;
+        let wasm_path = get_canister_wasm_path(canister_name);
+        let wasm_bytes = std::fs::read(&wasm_path).map_err(|e| {
+            format!(
+                "Failed to read {} canister WASM at {:?}: {}",
+                canister_name, wasm_path, e
+            )
+        })?;
 
         let canister_id = pic.create_canister();
 
@@ -179,6 +166,7 @@ impl TestEnvironment {
             pic,
             canister_id,
             config,
+            canister_name: canister_name.to_string(),
         })
     }
 
@@ -247,17 +235,45 @@ impl TestEnvironment {
     }
 
     pub fn upgrade_canister(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let wasm_path = get_canister_wasm_path();
+        let wasm_path = get_canister_wasm_path(&self.canister_name);
         let wasm_bytes = std::fs::read(&wasm_path)?;
         self.pic
             .upgrade_canister(self.canister_id, wasm_bytes, Encode!().unwrap(), None)
             .map_err(|e| format!("Upgrade failed: {:?}", e))?;
         Ok(())
     }
+
+    pub fn canister_name(&self) -> &str {
+        &self.canister_name
+    }
+
+    pub fn verify_entities_exist<T>(
+        &self,
+        entity_ids: &[String],
+        get_method: &str,
+    ) -> Result<usize, Box<dyn std::error::Error>>
+    where
+        T: for<'de> Deserialize<'de> + CandidType,
+    {
+        let mut found_count = 0;
+
+        for entity_id in entity_ids {
+            let result: Result<T, String> =
+                self.query_call(get_method, Encode!(entity_id).unwrap())?;
+
+            if result.is_ok() {
+                found_count += 1;
+            }
+        }
+
+        Ok(found_count)
+    }
 }
 
-// Helper function to get the canister WASM path
-pub fn get_canister_wasm_path() -> PathBuf {
+// Generic helper functions for canister testing
+
+// Helper function to get a canister WASM path (generic)
+pub fn get_canister_wasm_path(canister_name: &str) -> PathBuf {
     let cargo_manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     PathBuf::from(cargo_manifest_dir)
         .parent()
@@ -265,15 +281,18 @@ pub fn get_canister_wasm_path() -> PathBuf {
         .join("target")
         .join("wasm32-unknown-unknown")
         .join("release")
-        .join("example_canister.wasm")
+        .join(format!("{}.wasm", canister_name))
 }
 
-// Helper function to build the canister if needed
-pub fn ensure_canister_built() -> Result<(), Box<dyn std::error::Error>> {
-    let wasm_path = get_canister_wasm_path();
+// Helper function to build a canister if needed (generic)
+pub fn ensure_canister_built(
+    package_name: &str,
+    canister_name: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let wasm_path = get_canister_wasm_path(canister_name);
 
     if !wasm_path.exists() {
-        println!("Building canister...");
+        println!("Building {} canister...", canister_name);
         let status = std::process::Command::new("cargo")
             .args(&[
                 "build",
@@ -281,40 +300,32 @@ pub fn ensure_canister_built() -> Result<(), Box<dyn std::error::Error>> {
                 "wasm32-unknown-unknown",
                 "--release",
                 "--package",
-                "example-canister",
+                package_name,
             ])
             .status()?;
 
         if !status.success() {
-            return Err("Failed to build canister".into());
+            return Err(format!("Failed to build {} canister", canister_name).into());
         }
     }
 
     Ok(())
 }
 
-// Test data generators
+// Generic test data generators (canister-agnostic)
 pub struct TestDataGenerator;
 
 impl TestDataGenerator {
-    pub fn generate_user(index: usize, prefix: &str) -> (String, String) {
-        let username = format!("{}_{}", prefix, index);
-        let email = format!("{}_{}@example.com", prefix, index);
-        (username, email)
-    }
-
-    pub fn generate_post(index: usize, _user_id: &str, prefix: &str) -> (String, String) {
-        let title = format!("{} Post {}", prefix, index);
-        let content = format!("This is the content of {} post {}", prefix, index);
-        (title, content)
-    }
-
-    pub fn generate_comment(index: usize, prefix: &str) -> String {
-        format!("{} comment {}", prefix, index)
-    }
-
     pub fn generate_large_content(size: usize) -> String {
         "a".repeat(size)
+    }
+
+    pub fn generate_test_string(prefix: &str, index: usize) -> String {
+        format!("{}_{}", prefix, index)
+    }
+
+    pub fn generate_hex_id(prefix: &str, bytes: &[u8]) -> String {
+        format!("{}_{}", prefix, hex::encode(bytes))
     }
 }
 
@@ -413,71 +424,4 @@ macro_rules! assert_within_timeout {
         );
         result
     }};
-}
-
-// Common test patterns
-pub fn create_users_batch(
-    env: &TestEnvironment,
-    count: usize,
-    prefix: &str,
-) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let mut user_ids = Vec::new();
-
-    for i in 0..count {
-        let (username, email) = TestDataGenerator::generate_user(i, prefix);
-
-        let result: Result<User, String> =
-            env.update_call("create_user", Encode!(&username, &email).unwrap())?;
-
-        if let Ok(user) = result {
-            user_ids.push(user.id);
-        }
-    }
-
-    Ok(user_ids)
-}
-
-pub fn create_posts_batch(
-    env: &TestEnvironment,
-    user_ids: &[String],
-    posts_per_user: usize,
-    prefix: &str,
-) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let mut post_ids = Vec::new();
-
-    for (_user_idx, user_id) in user_ids.iter().enumerate() {
-        for post_idx in 0..posts_per_user {
-            let (title, content) = TestDataGenerator::generate_post(post_idx, user_id, prefix);
-
-            let result: Result<Post, String> =
-                env.update_call("create_post", Encode!(user_id, &title, &content).unwrap())?;
-
-            if let Ok(post) = result {
-                post_ids.push(post.id);
-            }
-        }
-    }
-
-    Ok(post_ids)
-}
-
-pub fn verify_entities_exist<T>(
-    env: &TestEnvironment,
-    entity_ids: &[String],
-    get_method: &str,
-) -> Result<usize, Box<dyn std::error::Error>>
-where
-    T: for<'de> Deserialize<'de> + CandidType,
-{
-    let mut found_count = 0;
-
-    for entity_id in entity_ids {
-        let result: Result<T, String> = env.query_call(get_method, Encode!(entity_id).unwrap())?;
-
-        if result.is_ok() {
-            found_count += 1;
-        }
-    }
-
-    Ok(found_count)
 }

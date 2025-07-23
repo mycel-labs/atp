@@ -1368,6 +1368,8 @@ name = "ic-nosql-tests"
 version = "0.1.0"
 dependencies = [
  "candid 0.10.14",
+ "example-canister",
+ "hex",
  "ic-nosql",
  "pocket-ic",
  "serde",

@@ -4,16 +4,18 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ic-nosql = { path = "../packages/ic-nosql" }
+example-canister = { path = "../packages/ic-nosql/example-canister" }
 candid = "0.10"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 pocket-ic = "=9.0.2"
-ic-nosql = { path = "../packages/ic-nosql" }
+hex = "0.4.3"
 
 [lib]
 name = "ic_nosql_tests"
 path = "lib.rs"
 
 [[test]]
-name = "stress_tests"
-path = "stress_tests.rs"
+name = "ic_nosql_stress_tests"
+path = "ic-nosql/stress_tests.rs"
