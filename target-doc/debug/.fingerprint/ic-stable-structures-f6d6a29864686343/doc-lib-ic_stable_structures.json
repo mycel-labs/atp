@@ -1,1 +1,0 @@
-{"rustc":18193982245986135480,"features":"[]","declared_features":"[\"canbench-rs\"]","target":13171474711583007697,"profile":9102090753619238930,"path":11014874240711681880,"deps":[[13353621847602688536,"ic_principal",false,4033071054960759865]],"local":[{"Precalculated":"0.6.8"}],"rustflags":[],"config":2069994364910194474,"compile_kind":0}

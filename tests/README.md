@@ -75,6 +75,7 @@ The example canister demonstrates how to use ic-nosql in a real Internet Compute
 
 3. **Run stress tests**:
    ```bash
+    export POCKET_IC_BIN=$(which pocket-ic)
     cargo test --package ic-nosql-tests --test stress_tests
    ```
 ## Memory Layout

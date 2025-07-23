@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DATA_MAGIC","INDEX_MAGIC"],"enum":["InitError","WriteError"],"fn":["iter_thread_local"],"struct":["Iter","Log","NoSuchEntry","ThreadLocalRefIterator"]};

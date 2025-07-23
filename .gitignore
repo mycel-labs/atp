@@ -15,6 +15,7 @@
 
 # rust
 target/
+target-doc/
 
 # frontend code
 node_modules/
