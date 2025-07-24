@@ -1,7 +1,7 @@
 # IC Nix environment version
 IC_NIX_VERSION := latest
 
-.PHONY: all build build-wasm generate-did clean help test setup-nix-env nix-shell-env
+.PHONY: all build build-atp generate-did-atp test test-package nix-shell-env clean install-tools help 
 # Default target
 all: build-atp generate-did-atp
 
