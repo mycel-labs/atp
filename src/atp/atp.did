@@ -8,6 +8,14 @@ type AccountReply = record {
   public_key_hex : text;
 };
 type AccountState = variant { active; locked; unlocked };
+type ActivateAccountRequest = record { account_id : text };
+type ActivateAccountResponse = record { account : AccountReply };
+type CreateAccountRequest = record {
+  algorithm : SignatureAlgorithm;
+  curve : Curve;
+  approved_address : principal;
+};
+type CreateAccountResponse = record { account : AccountReply };
 type Curve = variant { secp256k1; ed25519 };
 type Eip1559TransactionRequestDTO = record {
   to : opt text;
@@ -20,16 +28,29 @@ type Eip1559TransactionRequestDTO = record {
   chain_id : opt text;
   nonce : opt text;
 };
-type Result = variant { Ok : AccountReply; Err : text };
-type Result_1 = variant { Ok : text; Err : text };
+type GetAccountRequest = record { account_id : text };
+type GetAccountResponse = record { account : AccountReply };
+type GetEthAddressResponse = record { address : text };
+type Result = variant { Ok : ActivateAccountResponse; Err : text };
+type Result_1 = variant { Ok : CreateAccountResponse; Err : text };
+type Result_2 = variant { Ok : GetAccountResponse; Err : text };
+type Result_3 = variant { Ok : GetEthAddressResponse; Err : text };
+type Result_4 = variant { Ok : SignResponse; Err : text };
+type SignEip1559TransactionRequest = record {
+  account_id : text;
+  tx_request : Eip1559TransactionRequestDTO;
+};
+type SignRequest = record { account_id : text; message_hex : text };
+type SignResponse = record { signature : text };
 type SignatureAlgorithm = variant { ecdsa; schnorr };
+type TransferAccountRequest = record { to : principal; account_id : text };
 service : {
-  activate_account : (text) -> (Result);
-  create_account : (SignatureAlgorithm, Curve, principal) -> (Result);
-  get_account : (text) -> (Result) query;
-  get_eth_address : (text) -> (Result_1) query;
-  sign : (text, text) -> (Result_1);
-  sign_eip1559_transaction : (text, Eip1559TransactionRequestDTO) -> (Result_1);
-  transfer_account : (text, principal) -> (Result);
-  unlock_account : (text) -> (Result);
+  activate_account : (ActivateAccountRequest) -> (Result);
+  create_account : (CreateAccountRequest) -> (Result_1);
+  get_account : (GetAccountRequest) -> (Result_2) query;
+  get_eth_address : (GetAccountRequest) -> (Result_3) query;
+  sign : (SignRequest) -> (Result_4);
+  sign_eip1559_transaction : (SignEip1559TransactionRequest) -> (Result_4);
+  transfer_account : (TransferAccountRequest) -> (Result_2);
+  unlock_account : (GetAccountRequest) -> (Result_2);
 }

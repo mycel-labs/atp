@@ -2,7 +2,7 @@
 //!
 //! This module provides utilities for testing the ATP canister functionality
 use crate::test_utils::{TestConfig, TestEnvironment};
-use atp::application::dtos::account_reply::AccountReply;
+use atp::application::dtos::account_messages::*;
 use atp::application::dtos::eip1559::Eip1559TransactionRequestDTO;
 use atp::domain::models::signer::{Curve, SignatureAlgorithm};
 use candid::{Encode, Principal};
@@ -25,15 +25,18 @@ pub fn create_test_account(
     curve: Curve,
     approved_address: Principal,
     caller: Principal,
-) -> Result<AccountReply, Box<dyn std::error::Error>> {
-    let result: Result<AccountReply, String> = env.update_call(
-        "create_account",
-        Encode!(&algorithm, &curve, &approved_address).unwrap(),
-        Some(caller),
-    )?;
+) -> Result<CreateAccountResponse, Box<dyn std::error::Error>> {
+    let request = CreateAccountRequest {
+        algorithm,
+        curve,
+        approved_address,
+    };
+
+    let result: Result<CreateAccountResponse, String> =
+        env.update_call("create_account", Encode!(&request).unwrap(), Some(caller))?;
 
     match result {
-        Ok(account) => Ok(account),
+        Ok(response) => Ok(response),
         Err(e) => Err(e.into()),
     }
 }
@@ -42,12 +45,16 @@ pub fn create_test_account(
 pub fn get_account(
     env: &TestEnvironment,
     account_id: &str,
-) -> Result<AccountReply, Box<dyn std::error::Error>> {
-    let result: Result<AccountReply, String> =
-        env.query_call("get_account", Encode!(&account_id).unwrap())?;
+) -> Result<GetAccountResponse, Box<dyn std::error::Error>> {
+    let request = GetAccountRequest {
+        account_id: account_id.to_string(),
+    };
+
+    let result: Result<GetAccountResponse, String> =
+        env.query_call("get_account", Encode!(&request).unwrap())?;
 
     match result {
-        Ok(account) => Ok(account),
+        Ok(response) => Ok(response),
         Err(e) => Err(e.into()),
     }
 }
@@ -57,15 +64,16 @@ pub fn unlock_account(
     env: &TestEnvironment,
     account_id: &str,
     caller: Principal,
-) -> Result<AccountReply, Box<dyn std::error::Error>> {
-    let result: Result<AccountReply, String> = env.update_call(
-        "unlock_account",
-        Encode!(&account_id).unwrap(),
-        Some(caller),
-    )?;
+) -> Result<UnlockAccountResponse, Box<dyn std::error::Error>> {
+    let request = UnlockAccountRequest {
+        account_id: account_id.to_string(),
+    };
+
+    let result: Result<UnlockAccountResponse, String> =
+        env.update_call("unlock_account", Encode!(&request).unwrap(), Some(caller))?;
 
     match result {
-        Ok(account) => Ok(account),
+        Ok(response) => Ok(response),
         Err(e) => Err(e.into()),
     }
 }
@@ -76,15 +84,17 @@ pub fn transfer_account(
     account_id: &str,
     to: Principal,
     caller: Principal,
-) -> Result<AccountReply, Box<dyn std::error::Error>> {
-    let result: Result<AccountReply, String> = env.update_call(
-        "transfer_account",
-        Encode!(&account_id, &to).unwrap(),
-        Some(caller),
-    )?;
+) -> Result<TransferAccountResponse, Box<dyn std::error::Error>> {
+    let request = TransferAccountRequest {
+        account_id: account_id.to_string(),
+        to,
+    };
+
+    let result: Result<TransferAccountResponse, String> =
+        env.update_call("transfer_account", Encode!(&request).unwrap(), Some(caller))?;
 
     match result {
-        Ok(account) => Ok(account),
+        Ok(response) => Ok(response),
         Err(e) => Err(e.into()),
     }
 }
@@ -94,15 +104,16 @@ pub fn activate_account(
     env: &TestEnvironment,
     account_id: &str,
     caller: Principal,
-) -> Result<AccountReply, Box<dyn std::error::Error>> {
-    let result: Result<AccountReply, String> = env.update_call(
-        "activate_account",
-        Encode!(&account_id).unwrap(),
-        Some(caller),
-    )?;
+) -> Result<ActivateAccountResponse, Box<dyn std::error::Error>> {
+    let request = ActivateAccountRequest {
+        account_id: account_id.to_string(),
+    };
+
+    let result: Result<ActivateAccountResponse, String> =
+        env.update_call("activate_account", Encode!(&request).unwrap(), Some(caller))?;
 
     match result {
-        Ok(account) => Ok(account),
+        Ok(response) => Ok(response),
         Err(e) => Err(e.into()),
     }
 }
@@ -113,15 +124,17 @@ pub fn sign_message(
     account_id: &str,
     message_hex: &str,
     caller: Principal,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let result: Result<String, String> = env.update_call(
-        "sign",
-        Encode!(&account_id, &message_hex).unwrap(),
-        Some(caller),
-    )?;
+) -> Result<SignResponse, Box<dyn std::error::Error>> {
+    let request = SignRequest {
+        account_id: account_id.to_string(),
+        message_hex: message_hex.to_string(),
+    };
+
+    let result: Result<SignResponse, String> =
+        env.update_call("sign", Encode!(&request).unwrap(), Some(caller))?;
 
     match result {
-        Ok(signature) => Ok(signature),
+        Ok(response) => Ok(response),
         Err(e) => Err(e.into()),
     }
 }
@@ -132,15 +145,20 @@ pub fn sign_eip1559_transaction(
     account_id: &str,
     tx_request: Eip1559TransactionRequestDTO,
     caller: Principal,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let result: Result<String, String> = env.update_call(
+) -> Result<SignEip1559TransactionResponse, Box<dyn std::error::Error>> {
+    let request = SignEip1559TransactionRequest {
+        account_id: account_id.to_string(),
+        tx_request,
+    };
+
+    let result: Result<SignEip1559TransactionResponse, String> = env.update_call(
         "sign_eip1559_transaction",
-        Encode!(&account_id, &tx_request).unwrap(),
+        Encode!(&request).unwrap(),
         Some(caller),
     )?;
 
     match result {
-        Ok(signature) => Ok(signature),
+        Ok(response) => Ok(response),
         Err(e) => Err(e.into()),
     }
 }
@@ -149,12 +167,16 @@ pub fn sign_eip1559_transaction(
 pub fn get_eth_address(
     env: &TestEnvironment,
     account_id: &str,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let result: Result<String, String> =
-        env.query_call("get_eth_address", Encode!(&account_id).unwrap())?;
+) -> Result<GetEthAddressResponse, Box<dyn std::error::Error>> {
+    let request = GetEthAddressRequest {
+        account_id: account_id.to_string(),
+    };
+
+    let result: Result<GetEthAddressResponse, String> =
+        env.query_call("get_eth_address", Encode!(&request).unwrap())?;
 
     match result {
-        Ok(address) => Ok(address),
+        Ok(response) => Ok(response),
         Err(e) => Err(e.into()),
     }
 }
