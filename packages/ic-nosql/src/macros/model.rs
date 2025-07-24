@@ -19,8 +19,6 @@
 ///
 /// Model with secondary key:
 /// ```
-/// // Note: define_model! macro is currently disabled
-/// // Manual implementation would be needed
 /// # use ic_nosql::{CandidType, Deserialize, Serialize};
 /// # #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
 /// # pub enum AccountStatus { Active, Inactive }
@@ -62,11 +60,11 @@ macro_rules! define_model {
 
         impl ic_stable_structures::Storable for $name {
             fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-                std::borrow::Cow::Owned(candid::Encode!(self).unwrap())
+               std::borrow::Cow::Owned(candid::Encode!(self).expect("Failed to encode model for storage"))
             }
 
             fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-                candid::Decode!(bytes.as_ref(), Self).unwrap()
+               candid::Decode!(bytes.as_ref(), Self).expect("Failed to decode model from storage")
             }
 
             const BOUND: ic_stable_structures::storable::Bound =
@@ -116,11 +114,11 @@ macro_rules! define_model {
 
         impl ic_stable_structures::Storable for $name {
             fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-                std::borrow::Cow::Owned(candid::Encode!(self).unwrap())
+                std::borrow::Cow::Owned(candid::Encode!(self).expect("Failed to encode model for storage"))
             }
 
             fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-                candid::Decode!(bytes.as_ref(), Self).unwrap()
+                candid::Decode!(bytes.as_ref(), Self).expect("Failed to decode model from storage")
             }
 
             const BOUND: ic_stable_structures::storable::Bound =
@@ -130,7 +128,7 @@ macro_rules! define_model {
 
     // Helper to get the first field (used as default primary key)
     (@get_first_field $self:ident, $first:ident $(, $rest:ident)*) => {
-        $self.$first.to_string()
+        $self.$first.clone()
     };
 }
 

@@ -13,7 +13,7 @@ pub struct CompositeKey {
 }
 
 impl ic_stable_structures::Storable for CompositeKey {
-    fn to_bytes(&self) -> Cow<'_, [u8]> {
+    fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
 
@@ -29,7 +29,7 @@ impl ic_stable_structures::Storable for CompositeKey {
 pub struct CompositeKeys(pub Vec<CompositeKey>);
 
 impl ic_stable_structures::Storable for CompositeKeys {
-    fn to_bytes(&self) -> Cow<'_, [u8]> {
+    fn to_bytes(&self) -> Cow<[u8]> {
         // Encode the vector of CompositeKeys as bytes
         Cow::Owned(Encode!(&self.0).unwrap())
     }
@@ -55,7 +55,7 @@ impl<T> ic_stable_structures::Storable for Document<T>
 where
     T: Serialize + for<'de> Deserialize<'de> + CandidType,
 {
-    fn to_bytes(&self) -> Cow<'_, [u8]> {
+    fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
 

@@ -19,17 +19,19 @@ where
 }
 
 /// Convert data to storable bytes (Cow<[u8]>)
-pub fn to_storable_bytes<T>(data: &T) -> Cow<'_, [u8]>
+pub fn to_storable_bytes<T>(data: &T) -> Result<Cow<[u8]>, String>
 where
     T: CandidType + Serialize,
 {
-    Cow::Owned(Encode!(data).unwrap())
+    Encode!(data)
+        .map(Cow::Owned)
+        .map_err(|e| format!("Serialization error: {}", e))
 }
 
 /// Convert storable bytes back to data
-pub fn from_storable_bytes<T>(bytes: Cow<[u8]>) -> T
+pub fn from_storable_bytes<T>(bytes: Cow<[u8]>) -> Result<T, String>
 where
     T: CandidType + for<'de> Deserialize<'de>,
 {
-    Decode!(bytes.as_ref(), T).unwrap()
+    Decode!(bytes.as_ref(), T).map_err(|e| format!("Deserialization error: {}", e))
 }
