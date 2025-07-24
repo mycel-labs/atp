@@ -7,17 +7,17 @@
 pub mod test_utils;
 
 // ATP canister specific testing module
-// pub mod atp {
-// pub mod atp_test_utils;
-// #[cfg(test)]
-// pub mod integration_tests;
-// }
-//
-pub mod ic_nosql {
-    pub mod ic_nosql_test_utils;
+pub mod atp {
+    pub mod atp_test_utils;
     #[cfg(test)]
-    pub mod stress_tests;
+    pub mod integration_tests;
 }
+
+// pub mod ic_nosql {
+// pub mod ic_nosql_test_utils;
+// #[cfg(test)]
+// pub mod stress_tests;
+// }
 
 // Re-export common utilities for convenience
 pub use test_utils::{
