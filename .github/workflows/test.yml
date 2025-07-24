@@ -34,7 +34,9 @@ jobs:
         
     - name: Install PocketIC server
       uses: dfinity/pocketic@main
-      
+      with: 
+        pocket-ic-server-version: "9.0.3"
+
     - name: Confirm PocketIC installation
       run: ${POCKET_IC_BIN} --version
 
