@@ -3,7 +3,7 @@ use ethers_core::types::{transaction::eip1559::Eip1559TransactionRequest, Addres
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
-#[derive(CandidType, Serialize, Deserialize)]
+#[derive(CandidType, Clone, Serialize, Deserialize, Debug)]
 pub struct Eip1559TransactionRequestDTO {
     pub to: Option<String>,
     pub from: Option<String>,

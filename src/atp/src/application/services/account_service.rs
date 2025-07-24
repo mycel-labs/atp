@@ -1,6 +1,7 @@
 use candid::Principal;
 use ethers_core::types::transaction::eip1559::Eip1559TransactionRequest;
 
+use crate::application::dtos::account_messages::*;
 use crate::application::dtos::account_reply::AccountReply;
 use crate::domain::models::account::{Account, AccountState};
 use crate::domain::models::signer::{Curve, SignatureAlgorithm};
@@ -43,11 +44,9 @@ impl AccountService {
 
     pub async fn create_account(
         &self,
-        algorithm: SignatureAlgorithm,
-        curve: Curve,
+        request: CreateAccountRequest,
         owner: Principal,
-        approved_address: Principal,
-    ) -> Result<Account, String> {
+    ) -> Result<CreateAccountResponse, String> {
         // Generate a unique account ID
         let principal = ic_cdk::api::caller().to_string();
         let timestamp = ic_cdk::api::time();
@@ -57,7 +56,7 @@ impl AccountService {
         // Generate a new public key
         let public_key = self
             .signer_repository
-            .generate_public_key(algorithm.clone(), curve.clone(), id.clone())
+            .generate_public_key(request.algorithm.clone(), request.curve.clone(), id.clone())
             .await?;
 
         // Create a new account
@@ -65,54 +64,78 @@ impl AccountService {
             id,
             owner,
             public_key.public_key,
-            algorithm.clone(),
-            curve.clone(),
-            approved_address,
+            request.algorithm.clone(),
+            request.curve.clone(),
+            request.approved_address,
         );
 
-        self.account_repository.insert(account.clone())
+        let created_account = self.account_repository.insert(account.clone())?;
+        Ok(CreateAccountResponse {
+            account: self.to_account_reply(&created_account),
+        })
     }
 
-    pub fn unlock_account(&self, account_id: String) -> Result<Account, String> {
+    pub fn unlock_account(
+        &self,
+        request: UnlockAccountRequest,
+    ) -> Result<UnlockAccountResponse, String> {
         // Check if the account exists
-        let mut account = self.account_repository.get(&account_id)?;
+        let mut account = self.account_repository.get(&request.account_id)?;
         // unlock the account
         account.unlock()?;
         // update the account in the repository
-        self.account_repository.insert(account.clone())
+        let updated_account = self.account_repository.insert(account.clone())?;
+        Ok(UnlockAccountResponse {
+            account: self.to_account_reply(&updated_account),
+        })
     }
 
-    pub fn transfer_account(&self, account_id: String, to: Principal) -> Result<Account, String> {
+    pub fn transfer_account(
+        &self,
+        request: TransferAccountRequest,
+    ) -> Result<TransferAccountResponse, String> {
         // Check if the account exists
-        let mut account = self.account_repository.get(&account_id)?;
+        let mut account = self.account_repository.get(&request.account_id)?;
         // Transfer the account
-        account.transfer_account(to)?;
+        account.transfer_account(request.to)?;
         // update the account in the repository
-        self.account_repository.insert(account.clone())
+        let updated_account = self.account_repository.insert(account.clone())?;
+        Ok(TransferAccountResponse {
+            account: self.to_account_reply(&updated_account),
+        })
     }
 
-    pub fn activate_account(&self, account_id: String) -> Result<Account, String> {
+    pub fn activate_account(
+        &self,
+        request: ActivateAccountRequest,
+    ) -> Result<ActivateAccountResponse, String> {
         // Check if the account exists
-        let mut account = self.account_repository.get(&account_id)?;
+        let mut account = self.account_repository.get(&request.account_id)?;
         // unlock the account
         account.activate()?;
         // update the account in the repository
-        self.account_repository.insert(account.clone())
+        let updated_account = self.account_repository.insert(account.clone())?;
+        Ok(ActivateAccountResponse {
+            account: self.to_account_reply(&updated_account),
+        })
     }
 
-    pub fn get_account(&self, account_id: String) -> Result<Account, String> {
-        self.account_repository.get(&account_id)
+    pub fn get_account(&self, request: GetAccountRequest) -> Result<GetAccountResponse, String> {
+        let account = self.account_repository.get(&request.account_id)?;
+        Ok(GetAccountResponse {
+            account: self.to_account_reply(&account),
+        })
     }
 
-    pub async fn sign(&self, account_id: String, message_hex: String) -> Result<String, String> {
+    pub async fn sign(&self, request: SignRequest) -> Result<SignResponse, String> {
         // Check if the account exists
-        let account = self.account_repository.get(&account_id)?;
+        let account = self.account_repository.get(&request.account_id)?;
 
         // Check if the account is active
         if account.account_state().clone() != AccountState::Active {
             return Err("Account is not activated".to_string());
         }
-        let message_bytes = match hex::decode(&message_hex) {
+        let message_bytes = match hex::decode(&request.message_hex) {
             Ok(bytes) => bytes,
             Err(_) => return Err("Invalid hex string".to_string()),
         };
@@ -127,7 +150,9 @@ impl AccountService {
                     account.id().clone(),
                 )
                 .await?;
-            Ok(hex::encode(signature.signature))
+            Ok(SignResponse {
+                signature: hex::encode(signature.signature),
+            })
         } else {
             Err("Caller is not the owner of the account".to_string())
         }
@@ -135,11 +160,10 @@ impl AccountService {
 
     pub async fn sign_eip1559_transaction(
         &self,
-        account_id: String,
-        tx: Eip1559TransactionRequest,
-    ) -> Result<String, String> {
+        request: SignEip1559TransactionRequest,
+    ) -> Result<SignEip1559TransactionResponse, String> {
         // Check if the account exists
-        let account = self.account_repository.get(&account_id)?;
+        let account = self.account_repository.get(&request.account_id)?;
         // Check if the signature algorithm is ECDSA
         if account.algorithm().clone() != SignatureAlgorithm::Ecdsa {
             return Err("Signature algorithm is not ECDSA".to_string());
@@ -155,17 +179,23 @@ impl AccountService {
         }
         // Check if the caller is the owner of the account
         if account.is_owner(ic_cdk::api::caller()) {
-            self.signer_repository
+            let tx = Eip1559TransactionRequest::try_from(request.tx_request)?;
+            let signature = self
+                .signer_repository
                 .sign_eip1559_transaction(tx, account.id().clone())
-                .await
+                .await?;
+            Ok(SignEip1559TransactionResponse { signature })
         } else {
             Err("Caller is not the owner of the account".to_string())
         }
     }
 
-    pub fn get_eth_address(&self, account_id: String) -> Result<String, String> {
+    pub fn get_eth_address(
+        &self,
+        request: GetEthAddressRequest,
+    ) -> Result<GetEthAddressResponse, String> {
         // Check if the account exists
-        let account = self.account_repository.get(&account_id)?;
+        let account = self.account_repository.get(&request.account_id)?;
 
         // Check if the signature algorithm is ECDSA
         if account.algorithm().clone() != SignatureAlgorithm::Ecdsa {
@@ -176,6 +206,7 @@ impl AccountService {
             return Err("Curve is not secp256k1".to_string());
         }
 
-        generate_eth_address_from_sec1(account.public_key().clone())
+        let address = generate_eth_address_from_sec1(account.public_key().clone())?;
+        Ok(GetEthAddressResponse { address })
     }
 }
