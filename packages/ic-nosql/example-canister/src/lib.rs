@@ -3,37 +3,53 @@
 //! This canister shows how to use ic-nosql to manage different types of data
 //! in a single canister with proper memory management.
 
+use candid::{Decode, Encode};
 use ic_cdk::api::management_canister::main::raw_rand;
 use ic_cdk::{init, post_upgrade, pre_upgrade, query, update};
-use ic_nosql::{CandidType, DatabaseManager};
+use ic_nosql::{define_model, CandidType, DatabaseManager};
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 
-// Example models
-#[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
-pub struct User {
-    pub id: String,
-    pub username: String,
-    pub email: String,
-    pub created_at: u64,
+// Example models using the define_model! macro
+define_model! {
+    #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+    pub struct User {
+        pub id: String,
+        pub username: String,
+        pub email: String,
+        pub created_at: u64,
+    }
+
+    primary_key: id -> String,
+    secondary_key: username -> String,
 }
 
-#[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
-pub struct Post {
-    pub id: String,
-    pub user_id: String,
-    pub title: String,
-    pub content: String,
-    pub created_at: u64,
+define_model! {
+    #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+    pub struct Post {
+        pub id: String,
+        pub user_id: String,
+        pub title: String,
+        pub content: String,
+        pub created_at: u64,
+    }
+
+    primary_key: id -> String,
+    secondary_key: user_id -> String,
 }
 
-#[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
-pub struct Comment {
-    pub id: String,
-    pub post_id: String,
-    pub user_id: String,
-    pub content: String,
-    pub created_at: u64,
+define_model! {
+    #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+    pub struct Comment {
+        pub id: String,
+        pub post_id: String,
+        pub user_id: String,
+        pub content: String,
+        pub created_at: u64,
+    }
+
+    primary_key: id -> String,
+    secondary_key: post_id -> String,
 }
 
 // Global database manager

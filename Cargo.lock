@@ -841,6 +841,7 @@ dependencies = [
  "hex",
  "ic-cdk 0.17.2",
  "ic-nosql",
+ "ic-stable-structures",
  "serde",
 ]
 

@@ -29,25 +29,33 @@ ic-nosql = { path = "packages/ic-nosql" }
 ### 1. Define Your Models
 
 ```rust
-use ic_nosql::Model;
-use candid::{CandidType, Deserialize};
-use serde::Serialize;
+use ic_nosql::{define_model, CandidType};
+use serde::{Deserialize, Serialize};
 
-#[derive(Model, CandidType, Deserialize, Serialize, Clone, Debug)]
-pub struct User {
-    pub id: String,
-    pub username: String,
-    pub email: String,
-    pub created_at: u64,
+define_model! {
+    #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+    pub struct User {
+        pub id: String,
+        pub username: String,
+        pub email: String,
+        pub created_at: u64,
+    }
+    
+    primary_key: id -> String,
 }
 
-#[derive(Model, CandidType, Deserialize, Serialize, Clone, Debug)]
-pub struct Post {
-    pub id: String,
-    pub user_id: String,
-    pub title: String,
-    pub content: String,
-    pub created_at: u64,
+define_model! {
+    #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+    pub struct Post {
+        pub id: String,
+        pub user_id: String,
+        pub title: String,
+        pub content: String,
+        pub created_at: u64,
+    }
+    
+    primary_key: id -> String,
+    secondary_key: user_id -> String,
 }
 ```
 
@@ -140,13 +148,29 @@ DB_MANAGER.with(|db_manager| {
 
 ### Model Trait
 
-Derive the `Model` trait on your structs:
+Use the `define_model!` macro to automatically implement the Model trait:
 
 ```rust
-#[derive(Model, CandidType, Deserialize, Serialize, Clone, Debug)]
-pub struct MyModel {
-    pub id: String,
-    // ... other fields
+define_model! {
+    #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+    pub struct MyModel {
+        pub id: String,
+        pub name: String,
+        pub category: String,
+    }
+    
+    primary_key: id -> String,
+    secondary_key: category -> String,
+}
+
+// Or for simple models without secondary keys:
+define_model! {
+    #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+    pub struct SimpleModel {
+        pub id: String,
+        pub data: String,
+    }
+    primary_key: id -> String,
 }
 ```
 

@@ -8,6 +8,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 ic-nosql = { path = "../." }
+ic-stable-structures = "0.6.7"
 ic-cdk = "0.17"
 candid = "0.10"
 hex = "0.4"

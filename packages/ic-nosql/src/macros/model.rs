@@ -1,30 +1,58 @@
 /// Macro to easily define a model that implements all necessary traits
 ///
+/// This macro automatically implements the `Model` trait and `Storable` trait for your struct,
+/// making it ready to use with ic-nosql database operations. It requires explicit specification
+/// of the primary key for deterministic behavior.
+///
 /// # Examples
 ///
-/// Basic model definition:
+/// Model with only primary key (no secondary key):
 /// ```
-/// use ic_nosql::{CandidType, Deserialize, Serialize};
+/// use ic_nosql::{define_model, CandidType};
+/// use serde::{Deserialize, Serialize};
+/// use candid::{Decode, Encode};
 ///
-/// #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
-/// pub struct User {
-///     pub id: String,
-///     pub username: String,
-///     pub email: String,
-///     pub created_at: u64,
+/// define_model! {
+///     #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+///     pub struct Post {
+///         pub id: String,
+///         pub title: String,
+///         pub content: String,
+///     }
+///     
+///     primary_key: id -> String,
 /// }
 /// ```
 ///
-/// Model with secondary key:
+/// Model with both primary and secondary keys:
 /// ```
-/// # use ic_nosql::{CandidType, Deserialize, Serialize};
-/// # #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
-/// # pub enum AccountStatus { Active, Inactive }
-/// # pub struct Account { pub id: String }
+/// use ic_nosql::{define_model, CandidType};
+/// use serde::{Deserialize, Serialize};
+/// use candid::{Decode, Encode};
+///
+/// define_model! {
+///     #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]
+///     pub struct User {
+///         pub id: String,
+///         pub username: String,
+///         pub email: String,
+///         pub created_at: u64,
+///     }
+///     
+///     primary_key: id -> String,
+///     secondary_key: username -> String,
+/// }
 /// ```
+///
+/// # Key Requirements
+///
+/// - **Primary key is required**: You must explicitly specify which field serves as the primary key
+/// - **Secondary key is optional**: You can optionally specify a secondary key for indexed queries
+/// - **Field types**: The specified fields must implement `Clone` and match the declared types
+/// - **Deterministic behavior**: No ambiguity about which field is the primary key
 #[macro_export]
 macro_rules! define_model {
-    // Basic model without secondary key
+    // Model with only primary key (no secondary key)
     (
         $(#[$attr:meta])*
         $vis:vis struct $name:ident {
@@ -33,6 +61,8 @@ macro_rules! define_model {
                 $field_vis:vis $field_name:ident: $field_type:ty
             ),* $(,)?
         }
+
+        primary_key: $primary_field:ident -> $primary_type:ty,
     ) => {
         $(#[$attr])*
         $vis struct $name {
@@ -43,12 +73,15 @@ macro_rules! define_model {
         }
 
         impl $crate::traits::Model for $name {
-            type PrimaryKey = String;
+            type PrimaryKey = $primary_type;
             type SecondaryKey = ();
 
             fn get_primary_key(&self) -> Self::PrimaryKey {
-                // Assume the first field is the primary key
-                define_model!(@get_first_field self $(,$field_name)*)
+                self.$primary_field.clone()
+            }
+
+            fn get_secondary_key(&self) -> Option<Self::SecondaryKey> {
+                None
             }
 
             fn model_name() -> &'static str {
@@ -70,7 +103,7 @@ macro_rules! define_model {
         }
     };
 
-    // Model with custom primary key and optional secondary key
+    // Model with custom primary key and secondary key
     (
         $(#[$attr:meta])*
         $vis:vis struct $name:ident {
@@ -81,7 +114,7 @@ macro_rules! define_model {
         }
 
         primary_key: $primary_field:ident -> $primary_type:ty,
-        $(secondary_key: $secondary_field:ident -> $secondary_type:ty,)?
+        secondary_key: $secondary_field:ident -> $secondary_type:ty,
     ) => {
         $(#[$attr])*
         $vis struct $name {
@@ -93,17 +126,15 @@ macro_rules! define_model {
 
         impl $crate::traits::Model for $name {
             type PrimaryKey = $primary_type;
-            $(type SecondaryKey = $secondary_type;)?
+            type SecondaryKey = $secondary_type;
 
             fn get_primary_key(&self) -> Self::PrimaryKey {
                 self.$primary_field.clone()
             }
 
-            $(
-                fn get_secondary_key(&self) -> Option<Self::SecondaryKey> {
-                    Some(self.$secondary_field.clone())
-                }
-            )?
+            fn get_secondary_key(&self) -> Option<Self::SecondaryKey> {
+                Some(self.$secondary_field.clone())
+            }
 
             fn model_name() -> &'static str {
                 stringify!($name)
@@ -122,11 +153,6 @@ macro_rules! define_model {
             const BOUND: ic_stable_structures::storable::Bound =
                 ic_stable_structures::storable::Bound::Unbounded;
         }
-    };
-
-    // Helper to get the first field (used as default primary key)
-    (@get_first_field $self:ident, $first:ident $(, $rest:ident)*) => {
-        $self.$first.clone()
     };
 }
 
