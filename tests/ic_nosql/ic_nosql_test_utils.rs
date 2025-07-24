@@ -57,7 +57,7 @@ pub fn create_users_batch(
         let (username, email) = ExampleCanisterTestDataGenerator::generate_user(i, prefix);
 
         let result: Result<User, String> =
-            env.update_call("create_user", Encode!(&username, &email).unwrap())?;
+            env.update_call("create_user", Encode!(&username, &email).unwrap(), None)?;
 
         if let Ok(user) = result {
             user_ids.push(user.id);
@@ -80,8 +80,11 @@ pub fn create_posts_batch(
             let (title, content) =
                 ExampleCanisterTestDataGenerator::generate_post(post_idx, user_id, prefix);
 
-            let result: Result<Post, String> =
-                env.update_call("create_post", Encode!(user_id, &title, &content).unwrap())?;
+            let result: Result<Post, String> = env.update_call(
+                "create_post",
+                Encode!(user_id, &title, &content).unwrap(),
+                None,
+            )?;
 
             if let Ok(post) = result {
                 post_ids.push(post.id);

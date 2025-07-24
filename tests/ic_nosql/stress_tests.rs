@@ -31,6 +31,7 @@ fn stress_test_create_many_users() -> Result<(), Box<dyn std::error::Error>> {
         let (duration, result) = env.timed_update_call::<Result<User, String>>(
             "create_user",
             Encode!(&username, &email).unwrap(),
+            None,
         );
 
         let success = result.is_ok() && result.unwrap().is_ok();
@@ -118,7 +119,7 @@ fn stress_test_parallel_user_creation() -> Result<(), Box<dyn std::error::Error>
 
                 let start = Instant::now();
                 let result: Result<Result<User, String>, _> =
-                    env_clone.update_call("create_user", Encode!(&username, &email).unwrap());
+                    env_clone.update_call("create_user", Encode!(&username, &email).unwrap(), None);
                 let duration = start.elapsed();
 
                 let success = result.is_ok() && result.unwrap().is_ok();
@@ -198,8 +199,11 @@ fn stress_test_parallel_mixed_operations() -> Result<(), Box<dyn std::error::Err
                         "mixed_user",
                     );
                     let start = Instant::now();
-                    let result: Result<Result<User, String>, _> =
-                        env_clone.update_call("create_user", Encode!(&username, &email).unwrap());
+                    let result: Result<Result<User, String>, _> = env_clone.update_call(
+                        "create_user",
+                        Encode!(&username, &email).unwrap(),
+                        None,
+                    );
                     let duration = start.elapsed();
                     let success = result.is_ok() && result.unwrap().is_ok();
                     (duration, success)
@@ -296,6 +300,7 @@ fn stress_test_concurrent_operations() -> Result<(), Box<dyn std::error::Error>>
         let (duration, result) = env.timed_update_call::<Result<User, String>>(
             "create_user",
             Encode!(&username, &email).unwrap(),
+            None,
         );
 
         let success = result.is_ok() && result.unwrap().is_ok();

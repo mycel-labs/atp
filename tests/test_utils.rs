@@ -179,13 +179,19 @@ impl TestEnvironment {
         &self,
         method: &str,
         args: Vec<u8>,
+        principal: Option<Principal>,
     ) -> Result<T, Box<dyn std::error::Error>>
     where
         T: for<'de> Deserialize<'de> + CandidType,
     {
         let bytes = self
             .pic
-            .update_call(self.canister_id, Principal::anonymous(), method, args)
+            .update_call(
+                self.canister_id,
+                principal.unwrap_or(Principal::anonymous()),
+                method,
+                args,
+            )
             .map_err(|e| format!("Update call failed: {:?}", e))?;
 
         let result: T = Decode!(&bytes, T).map_err(|e| format!("Decode failed: {:?}", e))?;
@@ -215,12 +221,13 @@ impl TestEnvironment {
         &self,
         method: &str,
         args: Vec<u8>,
+        principal: Option<Principal>,
     ) -> (Duration, Result<T, Box<dyn std::error::Error>>)
     where
         T: for<'de> Deserialize<'de> + CandidType,
     {
         let start = Instant::now();
-        let result = self.update_call(method, args);
+        let result = self.update_call(method, args, principal);
         let duration = start.elapsed();
         (duration, result)
     }
@@ -331,6 +338,43 @@ impl TestDataGenerator {
 
     pub fn generate_hex_id(prefix: &str, bytes: &[u8]) -> String {
         format!("{}_{}", prefix, hex::encode(bytes))
+    }
+
+    // Generate a new test principal
+    pub fn generate_test_principal(suffix: &str) -> Principal {
+        // Create a simple hash from the suffix to get deterministic but different principals
+        let hash_input = format!("test_principal_{}", suffix);
+        let mut hash = 0u64;
+        for byte in hash_input.bytes() {
+            hash = hash.wrapping_mul(31).wrapping_add(byte as u64);
+        }
+
+        // Use the hash to select from different base principals
+        let base_principals = [
+            "rdmx6-jaaaa-aaaah-qcaiq-cai",
+            "rrkah-fqaaa-aaaah-qcupq-cai",
+            "rno2w-sqaaa-aaaah-qcvfq-cai",
+            "rkp4c-7iaaa-aaaah-qc7pq-cai",
+            "renrk-eyaaa-aaaah-qckmq-cai",
+        ];
+
+        let idx = (hash as usize) % base_principals.len();
+        Principal::from_text(base_principals[idx]).unwrap_or_else(|_| {
+            // Create a simple principal from raw bytes as fallback
+            let mut bytes = [0u8; 29];
+            bytes[0] = (hash & 0xFF) as u8;
+            bytes[1] = ((hash >> 8) & 0xFF) as u8;
+            bytes[2] = ((hash >> 16) & 0xFF) as u8;
+            bytes[3] = ((hash >> 24) & 0xFF) as u8;
+            Principal::from_slice(&bytes[0..4])
+        })
+    }
+
+    // Generate multiple unique test principals
+    pub fn generate_test_principals(count: usize) -> Vec<Principal> {
+        (0..count)
+            .map(|i| Self::generate_test_principal(&i.to_string()))
+            .collect()
     }
 }
 
