@@ -56,19 +56,19 @@ pub struct Post {
 ```rust
 use ic_nosql::DatabaseManager;
 
-static mut DB_MANAGER: Option<DatabaseManager> = None;
+thread_local! {
+    static DB_MANAGER: RefCell<Option<DatabaseManager>> = RefCell::new(None);
+}
 
 #[ic_cdk::init]
 fn init() {
-    unsafe {
-        DB_MANAGER = Some(DatabaseManager::new());
-        
-        if let Some(db) = &mut DB_MANAGER {
-            // Register models with unique memory IDs
-            db.register_model("users", Some(10), None).expect("Failed to register users");
-            db.register_model("posts", Some(11), None).expect("Failed to register posts");
-        }
-    }
+    let mut db_manager = DatabaseManager::new();
+    
+    // Register models with unique memory IDs
+    db_manager.register_model("users", Some(10), None).expect("Failed to register users");
+    db_manager.register_model("posts", Some(11), None).expect("Failed to register posts");
+    
+    DB_MANAGER.with(|db| *db.borrow_mut() = Some(db_manager));
 }
 ```
 
@@ -83,41 +83,42 @@ let user = User {
     created_at: ic_cdk::api::time(),
 };
 
-unsafe {
-    if let Some(db) = &mut DB_MANAGER {
-        db.insert("users", &user.id, &user)?;
-    }
-}
+DB_MANAGER.with(|db_manager| {
+    let mut db = db_manager.borrow_mut();
+    let db = db.as_mut().ok_or("Database not initialized")?;
+    db.insert("users", &user.id, &user)
+})?;
 
 // Read
-let user = unsafe {
-    DB_MANAGER.as_ref()
-        .unwrap()
-        .get::<User>("users", "user_123")?
-        .ok_or("User not found")?
-};
+let user = DB_MANAGER.with(|db_manager| {
+    let db = db_manager.borrow();
+    let db = db.as_ref().ok_or("Database not initialized")?;
+    db.get::<User>("users", "user_123")?
+        .ok_or("User not found")
+})?;
 
 // Query with pagination
-let response = unsafe {
-    DB_MANAGER.as_ref()
-        .unwrap()
-        .query::<User>("users", 10, 1)?
-};
+let response = DB_MANAGER.with(|db_manager| {
+    let db = db_manager.borrow();
+    let db = db.as_ref().ok_or("Database not initialized")?;
+    db.query::<User>("users", 10, 1)
+})?;
 
 // Update
-user.email = "newemail@example.com".to_string();
-unsafe {
-    if let Some(db) = &mut DB_MANAGER {
-        db.update("users", &user.id, &user)?;
-    }
-}
+let mut updated_user = user.clone();
+updated_user.email = "newemail@example.com".to_string();
+DB_MANAGER.with(|db_manager| {
+    let db = db_manager.borrow();
+    let db = db.as_ref().ok_or("Database not initialized")?;
+    db.update("users", &updated_user.id, &updated_user)
+})?;
 
 // Delete
-unsafe {
-    if let Some(db) = &mut DB_MANAGER {
-        db.delete("users", "user_123")?;
-    }
-}
+DB_MANAGER.with(|db_manager| {
+    let db = db_manager.borrow();
+    let db = db.as_ref().ok_or("Database not initialized")?;
+    db.delete("users", "user_123")
+})?;
 ```
 
 ## API Reference

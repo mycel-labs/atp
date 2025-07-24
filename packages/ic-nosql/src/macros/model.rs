@@ -4,8 +4,6 @@
 ///
 /// Basic model definition:
 /// ```
-/// // Note: define_model! macro is currently disabled
-/// // Manual implementation:
 /// use ic_nosql::{CandidType, Deserialize, Serialize};
 ///
 /// #[derive(Debug, Clone, CandidType, Deserialize, Serialize)]

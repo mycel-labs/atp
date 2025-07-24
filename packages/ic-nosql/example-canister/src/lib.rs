@@ -102,6 +102,8 @@ fn get_user(id: String) -> Result<User, String> {
 
 #[query]
 fn list_users(page: usize, size: usize) -> Result<Vec<User>, String> {
+    const MAX_PAGE_SIZE: usize = 1000;
+    let size = size.min(MAX_PAGE_SIZE);
     DB_MANAGER.with(|db| {
         let db = db.borrow();
         let response = db.query::<User>("users", size, page)?;

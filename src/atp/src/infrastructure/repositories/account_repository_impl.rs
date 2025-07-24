@@ -90,15 +90,20 @@ impl IAccountRepository for AccountRepositoryImpl {
         }
     }
 
-    fn find_by_owner(&self, owner: &str) -> Result<Vec<Account>, String> {
+    fn find_by_owner(
+        &self,
+        owner: &str,
+        page_size: usize,
+        page: usize,
+    ) -> Result<Vec<Account>, String> {
         let db = self.get_database()?;
 
         // Query using secondary index for owner
         let query_result = db.query(
             None,                    // No specific partition key
             Some(owner.to_string()), // Use owner as secondary key
-            100,                     // page size
-            1,                       // page number
+            page_size,               // page size
+            page,                    // page number
         )?;
 
         let accounts = query_result
@@ -292,7 +297,7 @@ mod account_repository_tests {
             .expect("Failed to insert account");
 
         // Test finding accounts by owner1
-        let result = repo.find_by_owner(&owner1.to_string());
+        let result = repo.find_by_owner(&owner1.to_string(), 100, 1);
         assert!(
             result.is_ok(),
             "Failed to find accounts by owner: {:?}",
@@ -316,7 +321,7 @@ mod account_repository_tests {
         }
 
         // Test finding accounts by owner2
-        let result = repo.find_by_owner(&owner2.to_string());
+        let result = repo.find_by_owner(&owner2.to_string(), 100, 1);
         assert!(
             result.is_ok(),
             "Failed to find accounts by owner: {:?}",
@@ -341,7 +346,7 @@ mod account_repository_tests {
         let repo = setup();
 
         // Test finding accounts by a non-existent owner
-        let result = repo.find_by_owner("non-existent-owner");
+        let result = repo.find_by_owner("non-existent-owner", 100, 1);
 
         // This might return an empty list or an error depending on your implementation
         // We'll test for an error, but if your implementation returns an empty list instead,
@@ -414,7 +419,7 @@ mod account_repository_tests {
         );
 
         // 4. Find by owner
-        let find_result = repo.find_by_owner(&owner.to_string());
+        let find_result = repo.find_by_owner(&owner.to_string(), 100, 1);
         assert!(find_result.is_ok(), "Failed to find accounts by owner");
         let found_accounts = find_result.unwrap();
         assert!(
@@ -446,7 +451,7 @@ mod account_repository_tests {
 
         // Verify both accounts can be found by owner using secondary index
         let found_accounts = repo
-            .find_by_owner(&owner.to_string())
+            .find_by_owner(&owner.to_string(), 100, 1)
             .expect("Failed to find accounts");
         assert!(
             found_accounts.len() >= 2,

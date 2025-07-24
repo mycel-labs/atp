@@ -23,7 +23,7 @@ where
         &self,
         partition_key: &str,
         sort_key: Option<String>,
-    ) -> Result<Document<T>, Self::Error>;
+    ) -> Result<Option<Document<T>>, Self::Error>;
 
     /// Query documents with pagination
     fn query(
