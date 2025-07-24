@@ -60,27 +60,27 @@ Alternatively, you can use the `dfx canister call` command to interact with the 
 
 #### Create an account
 ```bash
-dfx canister call atp create_account '(variant {ecdsa}, variant {secp256k1}, principal "YOUR_PRINCIPAL_ID")'
+dfx canister call atp create_account '(record { algorithm = variant {ecdsa}; curve = variant {secp256k1}; approved_address = principal "YOUR_PRINCIPAL_ID" })'
 ```
 
 #### Get account details
 ```bash
-dfx canister call atp get_account '("YOUR_ACCOUNT_ID")'
+dfx canister call atp get_account '(record { account_id = "YOUR_ACCOUNT_ID" })'
 ```
 
 #### Transfer an account
 ```bash
-dfx canister call atp transfer_account '("YOUR_ACCOUNT_ID", principal "NEW_OWNER_PRINCIPAL_ID")'
+dfx canister call atp transfer_account '(record { account_id = "YOUR_ACCOUNT_ID"; to = principal "NEW_OWNER_PRINCIPAL_ID" })'
 ```
 
 #### Activate an account
 ```bash
-dfx canister call atp activate_account '("YOUR_ACCOUNT_ID")'
+dfx canister call atp activate_account '(record { account_id = "YOUR_ACCOUNT_ID" })'
 ```
 
 #### Sign a message
 ```bash
-dfx canister call atp sign '("YOUR_ACCOUNT_ID", "48656c6c6f20576f726c64")'  # "Hello World" in hex
+dfx canister call atp sign '(record { account_id = "YOUR_ACCOUNT_ID"; message_hex = "48656c6c6f20576f726c64" })'  # "Hello World" in hex
 ```
 
 ## Example Implementation
@@ -95,21 +95,22 @@ dfx deploy
 MY_PRINCIPAL=$(dfx identity get-principal)
 
 # Step 3: Create an account with ECDSA/secp256k1
-RESULT=$(dfx canister call atp create_account "(variant {ecdsa}, variant {secp256k1}, principal \"$MY_PRINCIPAL\")")
+RESULT=$(dfx canister call atp create_account "(record { algorithm = variant {ecdsa}; curve = variant {secp256k1}; approved_address = principal \"$MY_PRINCIPAL\" })")
 
 # Step 4: Extract the account ID from the result
-ACCOUNT_ID=$(echo $RESULT | grep -o '"id": "[^"]*' | cut -d'"' -f4)
+ACCOUNT_ID=$(echo $RESULT | grep -o 'id = "[^"]*' | cut -d'"' -f2)
 
 # Step 5: Transfer the account to another principal
-OTHER_PRINCIPAL="aaaaa-aa"  # Replace with an actual principal
-dfx canister call atp transfer_account "(\"$ACCOUNT_ID\", principal \"$OTHER_PRINCIPAL\")"
+## Replace with an actual principal
+OTHER_PRINCIPAL="aaaaa-aa"
+dfx canister call atp transfer_account "(record { account_id = \"$ACCOUNT_ID\"; to = principal \"$OTHER_PRINCIPAL\" })"
 
 # Step 6: As the new owner, activate the account
 # (You would need to switch identities or use a different terminal)
-dfx canister call atp activate_account "(\"$ACCOUNT_ID\")"
+dfx canister call atp activate_account "(record { account_id = \"$ACCOUNT_ID\" })"
 
 # Step 7: Sign a message with the activated account
-dfx canister call atp sign "(\"$ACCOUNT_ID\", \"48656c6c6f20576f726c64\")"
+dfx canister call atp sign "(record { account_id = \"$ACCOUNT_ID\"; message_hex = \"48656c6c6f20576f726c64\" })"
 ```
 
 This example demonstrates the complete lifecycle of an account from creation to activation and usage.

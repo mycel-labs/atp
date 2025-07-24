@@ -60,6 +60,40 @@ struct AccountReply {
     approved_address: String,
 }
 
+// Request/Response types
+#[derive(CandidType, Clone, Deserialize)]
+struct CreateAccountRequest {
+    algorithm: SignatureAlgorithm,
+    curve: Curve,
+    approved_address: Principal,
+}
+
+#[derive(CandidType, Clone, Deserialize)]
+struct CreateAccountResponse {
+    account: AccountReply,
+}
+
+#[derive(CandidType, Clone, Deserialize)]
+struct TransferAccountRequest {
+    account_id: String,
+    to: Principal,
+}
+
+#[derive(CandidType, Clone, Deserialize)]
+struct TransferAccountResponse {
+    account: AccountReply,
+}
+
+#[derive(CandidType, Clone, Deserialize)]
+struct GetAccountRequest {
+    account_id: String,
+}
+
+#[derive(CandidType, Clone, Deserialize)]
+struct GetAccountResponse {
+    account: AccountReply,
+}
+
 // ATP canister ID (replace with your actual canister ID)
 const ATP_CANISTER_ID: &str = "your_atp_canister_id";
 
@@ -72,36 +106,41 @@ const ATP_CANISTER_ID: &str = "your_atp_canister_id";
 #[ic_cdk::update]
 async fn create_and_transfer_account(to: Principal) -> Result<AccountReply, String> {
     // Step 1: Create an account
-    let algorithm = SignatureAlgorithm::Ecdsa;
-    let curve = Curve::Secp256k1;
+    let create_request = CreateAccountRequest {
+        algorithm: SignatureAlgorithm::Ecdsa,
+        curve: Curve::Secp256k1,
+        approved_address: ic_cdk::id(), // Use this canister as the approved address
+    };
     
-    // Use this canister as the approved address
-    let approved_address = ic_cdk::id();
-    
-    let create_result: Result<AccountReply, String> = call(
+    let create_result: Result<CreateAccountResponse, String> = call(
         Principal::from_text(ATP_CANISTER_ID).unwrap(),
         "create_account",
-        (algorithm, curve, approved_address),
+        (create_request,),
     )
     .await
     .map_err(|e| format!("Error calling create_account: {:?}", e))?;
     
     let account = match create_result {
-        Ok(account) => account,
+        Ok(response) => response.account,
         Err(e) => return Err(format!("Failed to create account: {}", e)),
     };
     
     // Step 2: Transfer the account to the specified principal
-    let transfer_result: Result<AccountReply, String> = call(
+    let transfer_request = TransferAccountRequest {
+        account_id: account.id.clone(),
+        to,
+    };
+    
+    let transfer_result: Result<TransferAccountResponse, String> = call(
         Principal::from_text(ATP_CANISTER_ID).unwrap(),
         "transfer_account",
-        (account.id, to),
+        (transfer_request,),
     )
     .await
     .map_err(|e| format!("Error calling transfer_account: {:?}", e))?;
     
     match transfer_result {
-        Ok(account) => Ok(account),
+        Ok(response) => Ok(response.account),
         Err(e) => Err(format!("Failed to transfer account: {}", e)),
     }
 }
@@ -121,57 +160,75 @@ async fn swap_accounts(
     let this_canister = ic_cdk::id();
     
     // Step 2: Get account details to verify ownership and state
-    let account1_result: Result<AccountReply, String> = call(
+    let get_account1_request = GetAccountRequest {
+        account_id: user1_account_id.clone(),
+    };
+    
+    let account1_result: Result<GetAccountResponse, String> = call(
         Principal::from_text(ATP_CANISTER_ID).unwrap(),
         "get_account",
-        (user1_account_id.clone(),),
+        (get_account1_request,),
     )
     .await
     .map_err(|e| format!("Error getting account1: {:?}", e))?;
     
-    let account2_result: Result<AccountReply, String> = call(
+    let get_account2_request = GetAccountRequest {
+        account_id: user2_account_id.clone(),
+    };
+    
+    let account2_result: Result<GetAccountResponse, String> = call(
         Principal::from_text(ATP_CANISTER_ID).unwrap(),
         "get_account",
-        (user2_account_id.clone(),),
+        (get_account2_request,),
     )
     .await
     .map_err(|e| format!("Error getting account2: {:?}", e))?;
     
     // Step 3: Verify accounts are in the right state
     let account1 = match account1_result {
-        Ok(account) => {
-            if account.account_state != AccountState::Locked {
+        Ok(response) => {
+            if response.account.account_state != AccountState::Locked {
                 return Err("Account 1 must be locked for swapping".to_string());
             }
-            account
+            response.account
         },
         Err(e) => return Err(format!("Failed to get account 1: {}", e)),
     };
     
     let account2 = match account2_result {
-        Ok(account) => {
-            if account.account_state != AccountState::Locked {
+        Ok(response) => {
+            if response.account.account_state != AccountState::Locked {
                 return Err("Account 2 must be locked for swapping".to_string());
             }
-            account
+            response.account
         },
         Err(e) => return Err(format!("Failed to get account 2: {}", e)),
     };
     
     // Step 4: Transfer account1 to user2
-    let transfer1_result: Result<AccountReply, String> = call(
+    let transfer1_request = TransferAccountRequest {
+        account_id: user1_account_id,
+        to: user2,
+    };
+    
+    let transfer1_result: Result<TransferAccountResponse, String> = call(
         Principal::from_text(ATP_CANISTER_ID).unwrap(),
         "transfer_account",
-        (user1_account_id, user2),
+        (transfer1_request,),
     )
     .await
     .map_err(|e| format!("Error transferring account1: {:?}", e))?;
     
     // Step 5: Transfer account2 to user1
-    let transfer2_result: Result<AccountReply, String> = call(
+    let transfer2_request = TransferAccountRequest {
+        account_id: user2_account_id,
+        to: user1,
+    };
+    
+    let transfer2_result: Result<TransferAccountResponse, String> = call(
         Principal::from_text(ATP_CANISTER_ID).unwrap(),
         "transfer_account",
-        (user2_account_id, user1),
+        (transfer2_request,),
     )
     .await
     .map_err(|e| format!("Error transferring account2: {:?}", e))?;
