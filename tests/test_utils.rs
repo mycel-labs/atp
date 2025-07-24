@@ -8,7 +8,7 @@ use candid::{CandidType, Decode, Deserialize, Encode, Principal};
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
-use pocket_ic::PocketIc;
+use pocket_ic::{PocketIc, PocketIcBuilder};
 
 // Common data structures and utilities for all canister tests
 
@@ -146,7 +146,12 @@ impl TestEnvironment {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         ensure_canister_built(package_name, canister_name)?;
 
-        let pic = PocketIc::new();
+        let pic = PocketIcBuilder::new()
+            .with_ii_subnet() // this subnet has threshold keys
+            .with_application_subnet() // we deploy the dapp canister here
+            .with_nonmainnet_features(true) // the VetKd feature is not available on mainnet yet
+            .build();
+
         let wasm_path = get_canister_wasm_path(canister_name);
         let wasm_bytes = std::fs::read(&wasm_path).map_err(|e| {
             format!(

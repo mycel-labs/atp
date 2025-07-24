@@ -3,14 +3,14 @@
 //! These tests evaluate the basic performance and reliability of ic-nosql
 //! under moderate load with improved code organization and parallel processing.
 
-use candid::Encode;
-use ic_nosql_tests::{
-    ic_nosql::{
+use crate::{
+    ic_nosql::ic_nosql_test_utils::{
         create_example_canister_env, create_posts_batch, create_users_batch,
         ExampleCanisterTestDataGenerator, User,
     },
     test_utils::{assert_success_rate, PerformanceMetrics},
 };
+use candid::Encode;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Instant;
