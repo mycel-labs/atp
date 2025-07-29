@@ -1,7 +1,6 @@
 use ic_cdk::api::time;
 use ic_cdk::{heartbeat, init, post_upgrade, pre_upgrade};
 
-use crate::infrastructure::database::core::db_schema;
 use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
 use crate::utils::config::KEY_ID;
@@ -12,12 +11,9 @@ use crate::utils::config::KEY_ID;
 fn init() {
     ic_cdk::println!("[{}] Initializing canister", time());
 
-    // Initialize the database
-    db_schema::init_database();
-
     // Initialize the repositories
     SignerRepositoryImpl::init(KEY_ID.to_string());
-    AccountRepositoryImpl::init();
+    AccountRepositoryImpl::init().expect("Failed to initialize account repository");
 
     ic_cdk::println!("[{}] Canister initialized successfully", time());
 }
@@ -46,12 +42,9 @@ fn pre_upgrade() {
 fn post_upgrade() {
     ic_cdk::println!("[{}] Restoring after canister upgrade", time());
 
-    // Re-initialize the database (stable memory will be preserved)
-    db_schema::init_database();
-
     // Re-initialize the repositories
     SignerRepositoryImpl::init(KEY_ID.to_string());
-    AccountRepositoryImpl::init();
+    AccountRepositoryImpl::init().expect("Failed to initialize account repository");
 
     // If you saved any additional data in pre_upgrade, restore it here
     //

@@ -1,11 +1,7 @@
-use candid::Principal;
-use ethers_core::types::transaction::eip1559::Eip1559TransactionRequest;
 use ic_cdk::{query, update};
 
-use crate::application::dtos::account_reply::AccountReply;
-use crate::application::dtos::eip1559::Eip1559TransactionRequestDTO;
+use crate::application::dtos::account_messages::*;
 use crate::application::services::account_service::AccountService;
-use crate::domain::models::signer::{Curve, SignatureAlgorithm};
 use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
 
@@ -23,10 +19,8 @@ fn get_repositories() -> (AccountRepositoryImpl, SignerRepositoryImpl) {
 /// The caller will be set as the owner of the account.
 #[update]
 pub async fn create_account(
-    algorithm: SignatureAlgorithm,
-    curve: Curve,
-    approved_address: Principal,
-) -> Result<AccountReply, String> {
+    request: CreateAccountRequest,
+) -> Result<CreateAccountResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
@@ -34,12 +28,7 @@ pub async fn create_account(
     let owner = ic_cdk::api::caller();
 
     // Create the account
-    let account = service
-        .create_account(algorithm, curve, owner, approved_address)
-        .await?;
-
-    // Convert to DTO before returning
-    Ok(service.to_account_reply(&account))
+    service.create_account(request, owner).await
 }
 
 /// Unlock an account
@@ -47,15 +36,12 @@ pub async fn create_account(
 /// Only the approved address can unlock an account.
 /// The account must be in the Locked state.
 #[update]
-pub fn unlock_account(account_id: String) -> Result<AccountReply, String> {
+pub fn unlock_account(request: UnlockAccountRequest) -> Result<UnlockAccountResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Unlock the account
-    let account = service.unlock_account(account_id)?;
-
-    // Convert to DTO before returning
-    Ok(service.to_account_reply(&account))
+    service.unlock_account(request)
 }
 
 /// Transfer an account
@@ -63,15 +49,14 @@ pub fn unlock_account(account_id: String) -> Result<AccountReply, String> {
 /// Only the approved address can transfer an account
 /// The account must be in the Locked state.
 #[update]
-pub fn transfer_account(account_id: String, to: Principal) -> Result<AccountReply, String> {
+pub fn transfer_account(
+    request: TransferAccountRequest,
+) -> Result<TransferAccountResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Transfer the account
-    let account = service.transfer_account(account_id, to)?;
-
-    // Convert to DTO before returning
-    Ok(service.to_account_reply(&account))
+    service.transfer_account(request)
 }
 
 /// Activate an account
@@ -79,15 +64,14 @@ pub fn transfer_account(account_id: String, to: Principal) -> Result<AccountRepl
 /// Only the owner can activate an account.
 /// The account must be in the Unlocked state.
 #[update]
-pub fn activate_account(account_id: String) -> Result<AccountReply, String> {
+pub fn activate_account(
+    request: ActivateAccountRequest,
+) -> Result<ActivateAccountResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Activate the account
-    let account = service.activate_account(account_id)?;
-
-    // Convert to DTO before returning
-    Ok(service.to_account_reply(&account))
+    service.activate_account(request)
 }
 
 /// Get account details
@@ -95,15 +79,12 @@ pub fn activate_account(account_id: String) -> Result<AccountReply, String> {
 /// Retrieves the details of an account by its ID.
 /// Anyone can query account details.
 #[query]
-pub fn get_account(account_id: String) -> Result<AccountReply, String> {
+pub fn get_account(request: GetAccountRequest) -> Result<GetAccountResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Get the account
-    let account = service.get_account(account_id)?;
-
-    // Convert to DTO before returning
-    Ok(service.to_account_reply(&account))
+    service.get_account(request)
 }
 
 /// Sign a message with the account's private key
@@ -111,12 +92,12 @@ pub fn get_account(account_id: String) -> Result<AccountReply, String> {
 /// Only the owner can sign messages.
 /// The account must be in the Active state.
 #[update]
-pub async fn sign(account_id: String, message_hex: String) -> Result<String, String> {
+pub async fn sign(request: SignRequest) -> Result<SignResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Sign the message
-    service.sign(account_id, message_hex).await
+    service.sign(request).await
 }
 
 /// Sign an EIP-1559 transaction with the account's private key
@@ -126,17 +107,13 @@ pub async fn sign(account_id: String, message_hex: String) -> Result<String, Str
 /// The account must use ECDSA signature algorithm and secp256k1 curve.
 #[update]
 pub async fn sign_eip1559_transaction(
-    account_id: String,
-    tx_request: Eip1559TransactionRequestDTO,
-) -> Result<String, String> {
+    request: SignEip1559TransactionRequest,
+) -> Result<SignEip1559TransactionResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
-    let tx_request = Eip1559TransactionRequest::try_from(tx_request)?;
     // Sign the transaction
-    service
-        .sign_eip1559_transaction(account_id, tx_request)
-        .await
+    service.sign_eip1559_transaction(request).await
 }
 
 /// Get the Ethereum address derived from the account's public key
@@ -144,10 +121,13 @@ pub async fn sign_eip1559_transaction(
 /// The account must use ECDSA signature algorithm and secp256k1 curve.
 /// Anyone can get the Ethereum address.
 #[query]
-pub fn get_eth_address(account_id: String) -> Result<String, String> {
+pub fn get_eth_address(request: GetEthAddressRequest) -> Result<GetEthAddressResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
     // Generate Ethereum address
-    service.get_eth_address(account_id)
+    service.get_eth_address(request)
 }
+
+// Export the Candid interface
+ic_cdk::export_candid!();

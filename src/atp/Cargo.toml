@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 candid = "0.10"
@@ -22,9 +22,9 @@ serde_json = "1.0.133"
 sha3 = "0.10.8"
 ic-web3 = "0.1.7"
 bs58 = "0.5.0"
+ic-nosql = { path = "../../packages/ic-nosql" }
 
 [dev-dependencies]
 tokio = { version = "1.41.1", features = ["full"] }
 ic-cdk-macros = "0.6"
-serde = { version = "1.0", features = ["derive"] }
 

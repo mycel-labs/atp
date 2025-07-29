@@ -1,0 +1,17 @@
+[package]
+name = "ic-nosql"
+version = "0.1.0"
+edition = "2021"
+description = "A flexible NoSQL database library for Internet Computer canisters"
+license = "MIT"
+keywords = ["internet-computer", "nosql", "database", "ic", "canister"]
+categories = ["database", "web-programming"]
+
+[lib]
+name = "ic_nosql"
+path = "src/lib.rs"
+
+[dependencies]
+ic-stable-structures = "0.6.7"
+candid = "0.10"
+serde = { version = "1.0", features = ["derive"] }

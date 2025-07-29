@@ -1,4 +1,5 @@
 use candid::{CandidType, Decode, Encode, Principal};
+use ic_nosql::traits::Model;
 use ic_stable_structures::{storable::Bound, Storable};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -240,5 +241,22 @@ impl Account {
                 }
             }
         }
+    }
+}
+
+impl Model for Account {
+    type PrimaryKey = String;
+    type SecondaryKey = String; // For owner-based queries
+
+    fn get_primary_key(&self) -> Self::PrimaryKey {
+        self.id.clone()
+    }
+
+    fn get_secondary_key(&self) -> Option<Self::SecondaryKey> {
+        Some(self.owner.to_string())
+    }
+
+    fn model_name() -> &'static str {
+        "accounts"
     }
 }

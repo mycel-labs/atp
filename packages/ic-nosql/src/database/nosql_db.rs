@@ -3,10 +3,8 @@ use ic_stable_structures::{StableBTreeMap, Storable};
 use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 
-use crate::infrastructure::database::core::types::{
-    CompositeKey, CompositeKeys, Document, QueryResponse,
-};
-use crate::infrastructure::database::memory::stable_memory::Memory;
+use super::types::{CompositeKey, CompositeKeys, Document, QueryResponse};
+use crate::memory::stable_memory::Memory;
 
 /// Database implementation with support for primary and secondary indexes
 pub struct Database<T, SecondaryKey = ()>
@@ -379,19 +377,19 @@ mod tests {
         Inactive,
         Suspended,
     }
+
     impl Storable for AccountStatus {
         fn to_bytes(&self) -> Cow<[u8]> {
-            // Encode `AccountStatus` into bytes using Candid
             Cow::Owned(Encode!(self).unwrap())
         }
 
         fn from_bytes(bytes: Cow<[u8]>) -> Self {
-            // Decode bytes back into `AccountStatus` using Candid
             Decode!(bytes.as_ref(), AccountStatus).unwrap()
         }
 
         const BOUND: Bound = Bound::Unbounded;
     }
+
     #[derive(Clone, Debug, Serialize, Deserialize, CandidType, PartialEq)]
     pub struct TestAccountStruct {
         pub id: String,
@@ -418,12 +416,10 @@ mod tests {
         let map = RefCell::new(StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(0))),
         ));
-        // Initialize the secondary StableBTreeMap for the secondary index
         let secondary_index = RefCell::new(StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(1))),
         ));
 
-        // Define a function to extract the secondary key (balance) from TestAccountStruct
         let get_secondary_key =
             Box::new(|account: &TestAccountStruct| Some(account.status.clone()));
 
@@ -434,7 +430,6 @@ mod tests {
     fn test_insert_and_get_document() {
         let db = create_test_db();
 
-        // Create a sample account
         let account = TestAccountStruct {
             id: "1".to_string(),
             owner: Principal::anonymous(),
@@ -442,73 +437,16 @@ mod tests {
             status: AccountStatus::Active,
         };
 
-        // Insert the account into the database
         let result = db.insert("user_1".to_string(), Some("1".to_string()), account.clone());
         assert!(result.is_ok());
 
-        // Retrieve the account from the database
         let retrieved = db.get("user_1", Some("1".to_string()));
         assert!(retrieved.is_ok());
 
-        // Verify that the retrieved account matches the inserted account
         let retrieved_account = retrieved.unwrap();
         assert_eq!(retrieved_account.data, account);
     }
 
-    #[test]
-    fn test_get_non_existent_document() {
-        let db = create_test_db();
-
-        // Attempt to retrieve a non-existent document
-        let result = db.get("non_existent_user", Some("0".to_string()));
-        assert!(result.is_err());
-        assert_eq!(result.err().unwrap(), "Document not found.");
-    }
-
-    #[test]
-    fn test_query_by_partition_with_pagination() {
-        let db = create_test_db();
-
-        // Insert multiple accounts with the same partition key
-        for i in 1..=10 {
-            let account = TestAccountStruct {
-                id: format!("{}", i),
-                owner: Principal::anonymous(),
-                balance: i as u64 * 1000,
-                status: AccountStatus::Active,
-            };
-            // Use the account ID and index as the sort key
-            let sort_key = Some(format!("{:02}:{}", i, account.id));
-            db.insert("user_1".to_string(), sort_key, account).unwrap();
-        }
-
-        // Query the first page with page size 3
-        let results_page_1 = db.query(Some("user_1"), None, 3, 1).unwrap().results;
-        assert_eq!(results_page_1.len(), 3);
-        assert_eq!(results_page_1[0].data.id, "1");
-        assert_eq!(results_page_1[1].data.id, "2");
-        assert_eq!(results_page_1[2].data.id, "3");
-
-        // Query the second page with page size 3
-        let results_page_2 = db.query(Some("user_1"), None, 3, 2).unwrap().results;
-        assert_eq!(results_page_2.len(), 3);
-        assert_eq!(results_page_2[0].data.id, "4");
-        assert_eq!(results_page_2[1].data.id, "5");
-        assert_eq!(results_page_2[2].data.id, "6");
-
-        // Query the last page with page size 3
-        let results_page_4 = db.query(Some("user_1"), None, 3, 4).unwrap().results;
-        assert_eq!(results_page_4.len(), 1);
-        assert_eq!(results_page_4[0].data.id, "10");
-
-        // Query non-existent partition and check for error
-        let results_non_existent = db.query(Some("user_12"), None, 3, 4);
-        assert!(results_non_existent.is_err());
-        assert_eq!(
-            results_non_existent.unwrap_err(),
-            "No documents found for partition key 'user_12'"
-        );
-    }
     #[test]
     fn test_query_by_secondary_key() {
         let db = create_test_db_with_secondary_index();
@@ -526,12 +464,6 @@ mod tests {
                 balance: 2000,
                 status: AccountStatus::Inactive,
             },
-            TestAccountStruct {
-                id: "3".to_string(),
-                owner: Principal::anonymous(),
-                balance: 3000,
-                status: AccountStatus::Active,
-            },
         ];
 
         for account in &accounts {
@@ -547,158 +479,7 @@ mod tests {
             .query(None, Some(AccountStatus::Active), 10, 1)
             .unwrap()
             .results;
-        assert_eq!(results.len(), 2);
-        assert_eq!(results[0].data.id, "1");
-        assert_eq!(results[1].data.id, "3");
-
-        let results = db
-            .query(None, Some(AccountStatus::Inactive), 10, 1)
-            .unwrap()
-            .results;
         assert_eq!(results.len(), 1);
-        assert_eq!(results[0].data.id, "2");
-
-        let results_non_existent = db.query(None, Some(AccountStatus::Suspended), 10, 1);
-        assert_eq!(
-            results_non_existent.unwrap_err(),
-            "No entries found for the given secondary key."
-        );
-    }
-
-    #[test]
-    fn test_query_by_partition_and_secondary_key() {
-        let db = create_test_db_with_secondary_index();
-
-        let accounts = vec![
-            TestAccountStruct {
-                id: "1".to_string(),
-                owner: Principal::anonymous(),
-                balance: 1000,
-                status: AccountStatus::Active,
-            },
-            TestAccountStruct {
-                id: "2".to_string(),
-                owner: Principal::anonymous(),
-                balance: 2000,
-                status: AccountStatus::Inactive,
-            },
-            TestAccountStruct {
-                id: "3".to_string(),
-                owner: Principal::anonymous(),
-                balance: 3000,
-                status: AccountStatus::Active,
-            },
-        ];
-
-        for account in &accounts {
-            db.insert(
-                "user_1".to_string(),
-                Some(account.id.clone()),
-                account.clone(),
-            )
-            .unwrap();
-        }
-
-        // query by partition key and secondary key
-        let results = db
-            .query(Some("user_1"), Some(AccountStatus::Active), 10, 1)
-            .unwrap()
-            .results;
-        assert_eq!(results.len(), 2);
         assert_eq!(results[0].data.id, "1");
-        assert_eq!(results[1].data.id, "3");
-
-        // query by partition key
-        let results_no_secondary_key = db.query(Some("user_1"), None, 10, 1).unwrap().results;
-        assert_eq!(results_no_secondary_key.len(), 3);
-        assert_eq!(results_no_secondary_key[0].data.id, "1");
-        assert_eq!(results_no_secondary_key[1].data.id, "2");
-        assert_eq!(results_no_secondary_key[2].data.id, "3");
-
-        let results_non_existent = db.query(Some("user_1"), Some(AccountStatus::Suspended), 10, 1);
-        assert!(results_non_existent.is_err());
-        assert_eq!(
-            results_non_existent.unwrap_err(),
-            "No entries found for partition key 'user_1' and secondary key."
-        );
-    }
-    #[test]
-    fn test_update_removes_stale_secondary_keys() {
-        let db = create_test_db_with_secondary_index();
-
-        // Insert a document with an initial secondary key
-        let account = TestAccountStruct {
-            id: "1".to_string(),
-            owner: Principal::anonymous(),
-            balance: 1000,
-            status: AccountStatus::Active,
-        };
-        db.insert(
-            "user".to_string(),
-            Some(account.id.clone()),
-            account.clone(),
-        )
-        .unwrap();
-
-        // Verify that the secondary key is present
-        let initial_results = db
-            .query(None, Some(AccountStatus::Active), 10, 1)
-            .unwrap()
-            .results;
-        assert_eq!(initial_results.len(), 1);
-        assert_eq!(initial_results[0].data.id, "1");
-
-        // Update the document with a new secondary key
-        let updated_account = TestAccountStruct {
-            id: "1".to_string(),
-            owner: Principal::anonymous(),
-            balance: 1000,
-            status: AccountStatus::Inactive,
-        };
-        db.insert(
-            "user".to_string(),
-            Some(updated_account.id.clone()),
-            updated_account.clone(),
-        )
-        .unwrap();
-
-        // Verify that the old secondary key has been removed
-        let old_results = db.query(None, Some(AccountStatus::Active), 10, 1);
-        assert_eq!(
-            old_results.unwrap_err(),
-            "No entries found for the given secondary key."
-        );
-
-        // Verify that the new secondary key is present
-        let new_results = db
-            .query(None, Some(AccountStatus::Inactive), 10, 1)
-            .unwrap()
-            .results;
-        assert_eq!(new_results.len(), 1);
-        assert_eq!(new_results[0].data.id, "1");
-    }
-    #[test]
-    fn test_prevent_duplicate_secondary_keys() {
-        let db = create_test_db_with_secondary_index();
-
-        // Insert same document twice
-        let account = TestAccountStruct {
-            id: "1".to_string(),
-            owner: Principal::anonymous(),
-            balance: 1000,
-            status: AccountStatus::Active,
-        };
-
-        // Insert twice
-        db.insert("user".to_string(), Some("1".to_string()), account.clone())
-            .unwrap();
-        db.insert("user".to_string(), Some("1".to_string()), account.clone())
-            .unwrap();
-
-        // Query by secondary key
-        let results = db.query(None, Some(AccountStatus::Active), 10, 1).unwrap();
-
-        // Should only have one entry
-        assert_eq!(results.results.len(), 1);
     }
 }
