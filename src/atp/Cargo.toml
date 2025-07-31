@@ -1,9 +1,12 @@
 [package]
 name = "atp"
-version = "0.1.0"
+version.workspace = true
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "ATP protocol implementation for Internet Computer"
+license = "MIT"
+keywords = ["internet-computer", "atp", "protocol"]
+categories = ["web-programming"]
+repository = "https://github.com/mycel-labs/atp"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -22,7 +25,7 @@ serde_json = "1.0.133"
 sha3 = "0.10.8"
 ic-web3 = "0.1.7"
 bs58 = "0.5.0"
-ic-nosql = { path = "../../packages/ic-nosql" }
+ic-nosql = { workspace = true }
 
 [dev-dependencies]
 tokio = { version = "1.41.1", features = ["full"] }

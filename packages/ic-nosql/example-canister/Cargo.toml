@@ -2,12 +2,13 @@
 name = "example-canister"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-ic-nosql = { path = "../." }
+ic-nosql = { workspace = true }
 ic-stable-structures = "0.6.7"
 ic-cdk = "0.17"
 candid = "0.10"

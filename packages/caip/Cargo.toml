@@ -1,0 +1,23 @@
+[package]
+name = "atp-caip"
+edition = "2021"
+version.workspace = true
+description = "Chain Agnostic Improvement Proposals (CAIP) implementation for ATP(Account Transfer Protocol)"
+license = "MIT"
+keywords = ["caip", "blockchain", "protocol"]
+categories = ["web-programming"]
+repository = "https://github.com/mycel-labs/atp"
+
+[lib]
+name = "atp_caip"
+path = "src/lib.rs"
+
+[dependencies]
+config = "0.15.11"
+ethers-core = "2.0.14"
+lazy_static = "1.5.0"
+regex = "1.11.1"
+serde = "1.0.219"
+serde_json = "1.0.140"
+thiserror = "2.0.12"
+toml = "0.8.22"

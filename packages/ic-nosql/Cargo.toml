@@ -1,11 +1,12 @@
 [package]
 name = "ic-nosql"
-version = "0.1.0"
+version.workspace = true
 edition = "2021"
 description = "A flexible NoSQL database library for Internet Computer canisters"
 license = "MIT"
 keywords = ["internet-computer", "nosql", "database", "ic", "canister"]
 categories = ["database", "web-programming"]
+repository = "https://github.com/mycel-labs/atp"
 
 [lib]
 name = "ic_nosql"

@@ -1,0 +1,158 @@
+# Default Chain Registry Configuration
+[chains]
+
+[chains."eip155:1"]
+chain_id = "eip155:1"
+name = "Ethereum Mainnet"
+native_asset = "slip44:60"
+rpc_endpoints = [
+    "https://mainnet.infura.io/v3/YOUR-PROJECT-ID",
+    "https://eth-mainnet.alchemyapi.io/v2/YOUR-API-KEY",
+    "https://cloudflare-eth.com"
+]
+explorer_url = "https://etherscan.io"
+cryptographic_curve = ["secp256k1"]
+is_testnet = false
+# Fix: Use proper TOML table format for AssetIdBase structs
+assets = [
+    { asset_namespace = "slip44", asset_reference = "60" }
+]
+
+[chains."eip155:1".metadata]
+block_time = 12
+gas_token = "ETH"
+eip1559_supported = true
+max_priority_fee_per_gas = "2000000000"  # 2 gwei
+max_fee_per_gas = "50000000000"          # 50 gwei
+
+[chains."eip155:11155111"]
+chain_id = "eip155:11155111"
+name = "Ethereum Sepolia"
+native_asset = "slip44:60"
+rpc_endpoints = [
+    "https://sepolia.infura.io/v3/YOUR-PROJECT-ID",
+    "https://eth-sepolia.public.blastapi.io",
+    "https://rpc.sepolia.org"
+]
+explorer_url = "https://sepolia.etherscan.io"
+cryptographic_curve = ["secp256k1"]
+is_testnet = true
+assets = [
+    { asset_namespace = "slip44", asset_reference = "60" }
+]
+
+[chains."eip155:11155111".metadata]
+block_time = 12
+gas_token = "ETH"
+eip1559_supported = true
+max_priority_fee_per_gas = "1000000000"  # 1 gwei
+max_fee_per_gas = "20000000000"          # 20 gwei
+
+[chains."solana:mainnet"]
+chain_id = "solana:mainnet"
+name = "Solana Mainnet"
+native_asset = "slip44:501"
+rpc_endpoints = [
+    "https://api.mainnet-beta.solana.com",
+    "https://solana-api.projectserum.com",
+    "https://rpc.ankr.com/solana"
+]
+explorer_url = "https://solscan.io"
+cryptographic_curve = ["ed25519"]
+is_testnet = false
+assets = [
+    { asset_namespace = "slip44", asset_reference = "501" }
+]
+
+[chains."solana:mainnet".metadata]
+block_time = 0.4
+gas_token = "SOL"
+commitment = "confirmed"
+rent_exempt_minimum = 890880
+
+[chains."solana:devnet"]
+chain_id = "solana:devnet"
+name = "Solana Devnet"
+native_asset = "slip44:501"
+rpc_endpoints = [
+    "https://api.devnet.solana.com",
+    "https://devnet.helius-rpc.com/?api-key=YOUR-API-KEY"
+]
+explorer_url = "https://solscan.io/?cluster=devnet"
+cryptographic_curve = ["ed25519"]
+is_testnet = true
+assets = [
+    { asset_namespace = "slip44", asset_reference = "501" }
+]
+
+[chains."solana:devnet".metadata]
+block_time = 0.4
+gas_token = "SOL"
+commitment = "confirmed"
+rent_exempt_minimum = 890880
+
+[assets]
+
+[assets."slip44:60"]
+asset_id_base = { asset_namespace = "slip44", asset_reference = "60" }
+symbol = "ETH"
+name = "Ethereum"
+is_native = true
+decimals = 18
+
+[assets."slip44:60".metadata]
+coingecko_id = "ethereum"
+market_cap_rank = 2
+website = "https://ethereum.org"
+
+[assets."slip44:501"]
+asset_id_base = { asset_namespace = "slip44", asset_reference = "501" }
+symbol = "SOL"
+name = "Solana"
+is_native = true
+decimals = 9
+
+[assets."slip44:501".metadata]
+coingecko_id = "solana"
+market_cap_rank = 5
+website = "https://solana.com"
+
+# Trading pairs configuration
+
+## ETH to SOL on Mainnet
+[[token_pairs]]
+from_asset = { chain_id = { chain_namespace = "eip155", chain_reference = "1" }, asset_namespace = "slip44", asset_reference = "60" }
+to_asset = { chain_id = { chain_namespace = "solana", chain_reference = "mainnet" }, asset_namespace = "slip44", asset_reference = "501" }
+enabled = true
+min_trade_amount = "1000000000000000000"    # 1 ETH in wei
+max_trade_amount = "100000000000000000000"  # 100 ETH in wei
+fee_percentage = 0.3
+
+## SOL to ETH on Mainnet
+[[token_pairs]]
+from_asset = { chain_id = { chain_namespace = "solana", chain_reference = "mainnet" }, asset_namespace = "slip44", asset_reference = "501" }
+to_asset = { chain_id = { chain_namespace = "eip155", chain_reference = "1" }, asset_namespace = "slip44", asset_reference = "60" }
+enabled = true
+min_trade_amount = "1000000000"       # 1 SOL in lamports
+max_trade_amount = "1000000000000"    # 1000 SOL in lamports
+fee_percentage = 0.3
+
+# Testnet pairs for development
+
+## ETH to SOL on Testnet
+[[token_pairs]]
+from_asset = { chain_id = { chain_namespace = "eip155", chain_reference = "11155111" }, asset_namespace = "slip44", asset_reference = "60" }
+to_asset = { chain_id = { chain_namespace = "solana", chain_reference = "devnet" }, asset_namespace = "slip44", asset_reference = "501" }
+enabled = true
+min_trade_amount = "100000000000000000"  # 0.1 ETH
+max_trade_amount = "10000000000000000000" # 10 ETH
+fee_percentage = 0.5
+
+## SOL to ETH on Testnet
+[[token_pairs]]
+from_asset = { chain_id = { chain_namespace = "solana", chain_reference = "devnet" }, asset_namespace = "slip44", asset_reference = "501" }
+to_asset = { chain_id = { chain_namespace = "eip155", chain_reference = "11155111" }, asset_namespace = "slip44", asset_reference = "60" }
+enabled = true
+min_trade_amount = "100000000"   # 0.1 SOL
+max_trade_amount = "10000000000" # 10 SOL
+fee_percentage = 0.5

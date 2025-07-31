@@ -1,11 +1,24 @@
 [workspace]
 members = [
     "src/atp",
+    "packages/caip",
+    "packages/chain-registry",
     "packages/ic-nosql",
     "packages/ic-nosql/example-canister",
     "tests"
 ]
 resolver = "2"
 
+[workspace.package]
+version = "0.1.0"
+
+[workspace.metadata.release]
+shared-version = true
+consolidate-commits = true
+
 [workspace.dependencies]
-ic-nosql = { path = "packages/ic-nosql" }
+ic-nosql = { path = "packages/ic-nosql", version = "0.1.0" }
+atp-caip = { path = "packages/caip", version = "0.1.0" }
+atp-chain-registry = { path = "packages/chain-registry", version = "0.1.0" }
+atp = { path = "src/atp", version = "0.1.0" }
+example-canister = { path = "packages/ic-nosql/example-canister", version = "0.1.0" }
