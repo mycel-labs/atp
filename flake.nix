@@ -78,51 +78,6 @@
             platforms = [ "x86_64-linux" ];
           };
         };
-
-        # Download and install dfx (DFINITY SDK)
-        dfx = pkgs.stdenv.mkDerivation rec {
-          pname = "dfx";
-          version = "0.28.0";
-
-          src = pkgs.fetchurl {
-            url = "https://github.com/dfinity/sdk/releases/download/${version}/dfx-${version}-x86_64-linux.tar.gz";
-            sha256 = "sha256-Rknx7dHmf4FvfRvECZIDikMVoswdVn6TRf2LnGCtKeQ=";
-          };
-
-          nativeBuildInputs = with pkgs; [ patchelf ];
-
-          unpackPhase = ''
-            tar -xzf $src
-          '';
-
-          installPhase = ''
-            mkdir -p $out/bin
-            cp dfx $out/bin/dfx
-            chmod +x $out/bin/dfx
-
-            # Patch the binary for NixOS
-            patchelf --set-interpreter ${pkgs.glibc}/lib/ld-linux-x86-64.so.2 $out/bin/dfx
-            patchelf --set-rpath ${
-              pkgs.lib.makeLibraryPath [
-                pkgs.glibc
-                pkgs.gcc-unwrapped.lib
-              ]
-            } $out/bin/dfx
-          '';
-
-          # Add runtime dependencies
-          buildInputs = with pkgs; [
-            glibc
-            gcc-unwrapped.lib
-          ];
-
-          meta = with pkgs.lib; {
-            description = "DFINITY SDK for Internet Computer development";
-            homepage = "https://github.com/dfinity/sdk";
-            license = licenses.asl20;
-            platforms = [ "x86_64-linux" ];
-          };
-        };
       in
       {
         devShells.default = pkgs.mkShell {
@@ -141,7 +96,6 @@
 
             # Internet Computer tools
             pocket-ic
-            dfx
 
             # System tools
             git
@@ -149,26 +103,26 @@
           ];
 
           shellHook = ''
-            # Add cargo bin to PATH
-            export PATH="$HOME/.cargo/bin:$PATH"
+                  # Add cargo bin to PATH
+                  export PATH="$HOME/.cargo/bin:$PATH"
 
-            # Set POCKET_IC_BIN environment variable
-            export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
+                  # Set POCKET_IC_BIN environment variable
+                  export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
 
-            # Install candid-extractor if not present
-            if ! command -v candid-extractor &> /dev/null; then
-              echo "Installing candid-extractor..."
-              cargo install candid-extractor
-            fi
+                  # Install candid-extractor if not present
+                  if ! command -v candid-extractor &> /dev/null; then
+                    echo "Installing candid-extractor..."
+            self,
+                    cargo install candid-extractor
+                  fi
 
 
-            echo "🦀 ATP Development Environment"
-            echo "================================"
-            echo "Rust version: $(rustc --version)"
-            echo "Cargo version: $(cargo --version)"
-            echo "DFX version: $(dfx --version)"
-            echo "pocket-ic version: $(pocket-ic --version)"
-            echo ""
+                  echo "🦀 ATP Development Environment"
+                  echo "================================"
+                  echo "Rust version: $(rustc --version)"
+                  echo "Cargo version: $(cargo --version)"
+                  echo "pocket-ic version: $(pocket-ic --version)"
+                  echo ""
 
           '';
 
