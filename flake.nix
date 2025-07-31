@@ -93,6 +93,7 @@
             cargo-watch
             cargo-edit
             cargo-outdated
+            cargo-release
 
             # Internet Computer tools
             pocket-ic
