@@ -1,7 +1,6 @@
 use ethers_core::types::U256;
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::str::FromStr;
 
 use crate::error::{CaipError, Result};
 
@@ -304,8 +303,12 @@ impl Money {
     /// let eth = Money::from_decimal_str("100", 18).unwrap();
     /// assert_eq!(fee.to_decimal_string(), "3");
     pub fn percentage(&self, percent: u64) -> Money {
+        let multiplied = self
+            .amount
+            .checked_mul(U256::from(percent))
+            .expect("Percentage calculation overflow");
         Money {
-            amount: self.amount * U256::from(percent) / U256::from(100),
+            amount: multiplied / U256::from(100),
             decimals: self.decimals,
         }
     }
@@ -393,21 +396,10 @@ impl fmt::Display for Money {
     }
 }
 
-impl FromStr for Money {
-    type Err = CaipError;
-
-    fn from_str(s: &str) -> Result<Self> {
-        // Default to 18 decimals if not specified
-        // In practice, you'd want to know the currency type
-        Self::from_decimal_str(s, 18)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use ethers_core::types::U256;
-    use std::str::FromStr;
 
     #[test]
     fn test_money_creation() {
@@ -726,14 +718,6 @@ mod tests {
     fn test_display_and_from_str() {
         let money = Money::from_decimal_str("123.456", 18).unwrap();
         assert_eq!(format!("{}", money), "123.456");
-
-        // Test FromStr with default 18 decimals
-        let money2 = Money::from_str("123.456").unwrap();
-        assert_eq!(money2.to_decimal_string(), "123.456");
-        assert_eq!(money2.decimals, 18);
-
-        // Test FromStr error
-        assert!(Money::from_str("invalid").is_err());
     }
 
     #[test]
