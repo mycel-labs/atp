@@ -317,8 +317,13 @@ impl Money {
     /// let eth = Money::from_decimal_str("100", 18).unwrap();
     /// assert_eq!(fee.to_decimal_string(), "2.5");
     pub fn basis_points(&self, bps: u64) -> Money {
+        let multiplied = self
+            .amount
+            .checked_mul(U256::from(bps))
+            .expect("Percentage calculation overflow");
+
         Money {
-            amount: self.amount * U256::from(bps) / U256::from(10000),
+            amount: multiplied / U256::from(10000),
             decimals: self.decimals,
         }
     }
