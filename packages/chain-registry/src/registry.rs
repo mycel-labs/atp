@@ -115,11 +115,6 @@ impl ChainRegistry {
         &self.config
     }
 
-    /// let mut registry = ChainRegistry::new();
-    pub fn config_mut(&mut self) -> &mut RegistryConfig {
-        &mut self.config
-    }
-
     /// use atp_caip::{AssetIdBase, Curve};
     /// use std::collections::HashMap;
     /// let mut registry = ChainRegistry::new();
