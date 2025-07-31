@@ -68,7 +68,7 @@ impl TokenPair {
     pub fn from_pair_string(pair_str: &str) -> Result<Self, crate::error::CaipError> {
         let parts: Vec<&str> = pair_str.split('-').collect();
         if parts.len() != 2 {
-            return Err(crate::error::CaipError::InvalidTokenPariString(format!(
+            return Err(crate::error::CaipError::InvalidTokenPairString(format!(
                 "Invalid pair string format: {}",
                 pair_str
             )));

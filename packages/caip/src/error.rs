@@ -18,7 +18,7 @@ pub enum CaipError {
     UnknownAssetNamespace(String),
 
     #[error("Invalid TokenPair string format: {0}")]
-    InvalidTokenPariString(String),
+    InvalidTokenPairString(String),
 
     #[error("Decimal overflow: max {max}, got {got}")]
     DecimalOverflow { max: u8, got: u8 },

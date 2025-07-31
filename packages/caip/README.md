@@ -24,13 +24,13 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-caip = "0.1.0"
+atp_caip = "0.1.0"
 ```
 
 ## Quick Start
 
 ```rust
-use caip::{ChainId, AssetId, Money, TokenPair};
+use atp_caip::{ChainId, AssetId, Money, TokenPair};
 use std::str::FromStr;
 
 // Create chain identifiers
@@ -61,7 +61,7 @@ println!("Cross-chain pair: {}", cross_chain_pair.is_cross_chain()); // true
 Chain IDs follow the format `namespace:reference` and identify specific blockchain networks:
 
 ```rust
-use caip::ChainId;
+use atp_caip::ChainId;
 
 // Ethereum mainnet
 let ethereum = ChainId::new("eip155", "1")?;
@@ -82,7 +82,7 @@ assert_eq!(chain.reference(), "1");
 Asset IDs follow the format `chain_id/asset_namespace:asset_reference`:
 
 ```rust
-use caip::{AssetId, AssetIdBase, ChainId};
+use atp_caip::{AssetId, AssetIdBase, ChainId};
 
 let ethereum = ChainId::new("eip155", "1")?;
 
@@ -108,7 +108,7 @@ assert_eq!(asset_base.to_string(), "slip44:60");
 Account IDs follow the format `chain_id:account_address`:
 
 ```rust
-use caip::{AccountId, ChainId};
+use atp_caip::{AccountId, ChainId};
 
 let ethereum = ChainId::new("eip155", "1")?;
 let account = AccountId::new(
@@ -127,7 +127,7 @@ assert_eq!(account.account_address(), "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcd
 The `Money` type provides precise decimal arithmetic for cryptocurrency amounts:
 
 ```rust
-use caip::Money;
+use atp_caip::Money;
 use ethers_core::types::U256;
 
 // Create from decimal string (human-readable)
@@ -165,7 +165,7 @@ assert!(Money::zero(18)?.is_zero());
 Combines an asset identifier with a money amount:
 
 ```rust
-use caip::{Asset, AssetId, Money, ChainId};
+use atp_caip::{Asset, AssetId, Money, ChainId};
 
 let ethereum = ChainId::new("eip155", "1")?;
 let eth_id = AssetId::new(ethereum, "slip44", "60")?;
@@ -183,7 +183,7 @@ assert_eq!(usd_value, 7500.0); // 2.5 * 3000
 Represent trading relationships between two assets:
 
 ```rust
-use caip::{TokenPair, AssetId, ChainId};
+use atp_caip::{TokenPair, AssetId, ChainId};
 
 let ethereum = ChainId::new("eip155", "1")?;
 let solana = ChainId::new("solana", "mainnet")?;
@@ -220,7 +220,7 @@ assert_eq!(parsed_pair, pair);
 Predefined enums for common blockchain and asset namespaces:
 
 ```rust
-use caip::{ChainNamespace, AssetNamespace};
+use atp_caip::{ChainNamespace, AssetNamespace};
 
 // Chain namespaces
 let evm_chains = ChainNamespace::Eip155;
@@ -243,7 +243,7 @@ assert_eq!(erc20_tokens.as_str(), "erc20");
 Support for different cryptographic signature algorithms:
 
 ```rust
-use caip::Curve;
+use atp_caip::Curve;
 
 let ethereum_curve = Curve::Secp256k1;
 let solana_curve = Curve::Ed25519;
@@ -254,7 +254,7 @@ let solana_curve = Curve::Ed25519;
 Comprehensive error types for validation and parsing failures:
 
 ```rust
-use caip::{CaipError, ChainId, AssetId, Money};
+use atp_caip::{CaipError, ChainId, AssetId, Money};
 
 // Invalid chain ID format
 match ChainId::new("", "1") {
@@ -292,14 +292,14 @@ All identifiers are validated against CAIP specification regex patterns:
 - **Asset ID**: `^([-a-z0-9]{3,8}):([-a-zA-Z0-9]{1,32})/([-a-z0-9]{3,8}):([-a-zA-Z0-9]{1,64})$`
 - **Asset ID Base**: `^([-a-z0-9]{3,8}):([-a-zA-Z0-9]{1,64})$`
 
-## Integration with SolverOS Chain Registry
+## Integration with ATP Chain Registry
 
-This crate is designed to work seamlessly with `solveros-chain-registry`:
+This crate is designed to work seamlessly with `atp-chain-registry`:
 
 ```rust
 // The chain registry uses CAIP types for configuration
-use chain_registry::ChainRegistry;
-use caip::{AssetId, ChainId};
+use atp_chain_registry::ChainRegistry;
+use atp_caip::{AssetId, ChainId};
 
 let registry = ChainRegistry::default()?;
 
@@ -321,7 +321,7 @@ let secp256k1_chains = registry.get_chains_by_curve(&caip::Curve::Secp256k1);
 All types support Serde serialization for configuration files and APIs:
 
 ```rust
-use caip::{ChainId, AssetId, TokenPair};
+use atp_caip::{ChainId, AssetId, TokenPair};
 use serde_json;
 
 let chain = ChainId::new("eip155", "1")?;
@@ -360,7 +360,7 @@ The crate includes comprehensive tests covering:
 ### Cross-Chain Trading Scenario
 
 ```rust
-use caip::{ChainId, AssetId, Money, Asset, TokenPair};
+use atp_caip::{ChainId, AssetId, Money, Asset, TokenPair};
 
 // Set up chains
 let ethereum = ChainId::new("eip155", "1")?;
@@ -397,7 +397,7 @@ println!("Is cross-chain: {}", trading_pair.is_cross_chain());
 ### Multi-Chain Asset Management
 
 ```rust
-use caip::{ChainId, AssetId, AssetIdBase, Money};
+use atp_caip::{ChainId, AssetId, AssetIdBase, Money};
 use std::collections::HashMap;
 
 // Define supported chains

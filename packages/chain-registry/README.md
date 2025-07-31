@@ -1,5 +1,5 @@
 # ATP Chain Registry
-A comprehensive, type-safe chain registry for multi-chain applications, designed for SolverOS and cross-chain arbitrage systems. Built with Rust and following CAIP (Chain Agnostic Improvement Proposals) standards.
+A comprehensive, type-safe chain registry for multi-chain applications, designed for ATP and cross-chain arbitrage systems. Built with Rust and following CAIP (Chain Agnostic Improvement Proposals) standards.
 
 ## 🎯 Overview
 
@@ -24,15 +24,13 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-chain-registry = "0.1.0"
-serde = { version = "1.0", features = ["derive"] }
-toml = "0.8"
+atp-chain-registry = "0.1.0"
 ```
 
 ### Basic Usage
 
 ```rust
-use chain_registry::{ChainRegistry, ChainId, AssetId};
+use atp_chain_registry::{ChainRegistry, ChainId, AssetId};
 use std::str::FromStr;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -136,7 +134,7 @@ The registry is designed to be easily extensible. Add support for new chains by:
 
 ### Programmatic Configuration
 ```rust
-use chain_registry::*;
+use atp_chain_registry::*;
 
 let mut registry = ChainRegistry::new();
 
@@ -215,9 +213,7 @@ Expected output:
 
 ### More Examples
 
-- `examples/basic_usage.rs` - Simple usage patterns
-- `examples/advanced_queries.rs` - Complex routing and analytics
-- `examples/solverx_integration.rs` - SolverOS integration patterns
+- `examples/configuration_summary.rs` - Show configuration summary
 
 ## 🔍 Testing
 
