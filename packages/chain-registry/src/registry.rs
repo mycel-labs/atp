@@ -234,25 +234,6 @@ impl ChainRegistry {
             .ok_or_else(|| ChainRegistryError::AssetNotFound(asset_id.to_string()))
     }
 
-    /// use std::str::FromStr;
-    /// let mut registry = ChainRegistry::default().unwrap();
-    /// let chain_id = ChainId::from_str("eip155:1").unwrap();
-    /// let asset_id = AssetId::new(chain_id, "slip44", "60").unwrap();
-    /// let asset_config = registry.get_asset_id_base_mut(&asset_id).unwrap();
-    /// asset_config.name = "Ethereum Updated".to_string();
-    pub fn get_asset_id_base_mut(&mut self, asset_id: &AssetId) -> Result<&mut AssetConfig> {
-        // Create the asset base from the AssetId for lookup
-        let asset_base_key = format!(
-            "{}:{}",
-            asset_id.asset_namespace(),
-            asset_id.asset_reference()
-        );
-        self.config
-            .assets
-            .get_mut(&asset_base_key)
-            .ok_or_else(|| ChainRegistryError::AssetNotFound(asset_id.to_string()))
-    }
-
     /// let registry = ChainRegistry::default().unwrap();
     /// let assets = registry.list_assets();
     /// assert!(!assets.is_empty());
