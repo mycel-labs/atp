@@ -297,7 +297,7 @@ impl ChainRegistry {
 
         // Check if pair already exists
         if self
-            .find_token_pair(&pair.from_asset, &pair.to_asset)
+            .find_enabled_token_pair(&pair.from_asset, &pair.to_asset)
             .is_some()
         {
             return Err(ChainRegistryError::ConfigError(format!(
@@ -348,7 +348,11 @@ impl ChainRegistry {
     /// let sol_chain = ChainId::from_str("solana:mainnet").unwrap();
     /// let eth = AssetId::new(eth_chain, "slip44", "60").unwrap();
     /// let sol = AssetId::new(sol_chain, "slip44", "501").unwrap();
-    pub fn find_token_pair(&self, from_asset: &AssetId, to_asset: &AssetId) -> Option<&TokenPair> {
+    pub fn find_enabled_token_pair(
+        &self,
+        from_asset: &AssetId,
+        to_asset: &AssetId,
+    ) -> Option<&TokenPair> {
         self.config.token_pairs.iter().find(|pair| {
             pair.enabled && pair.from_asset == *from_asset && pair.to_asset == *to_asset
         })

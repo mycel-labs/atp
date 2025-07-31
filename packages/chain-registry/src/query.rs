@@ -221,7 +221,7 @@ impl ChainRegistry {
     /// let eth = AssetId::new(eth_chain, "slip44", "60").unwrap();
     /// let sol = AssetId::new(sol_chain, "slip44", "501").unwrap();
     pub fn is_pair_supported(&self, from_asset: &AssetId, to_asset: &AssetId) -> bool {
-        self.find_token_pair(from_asset, to_asset).is_some()
+        self.find_enabled_token_pair(from_asset, to_asset).is_some()
     }
 
     /// * `Vec<Vec<&TokenPair>>` - Vector of trading routes, where each route is a sequence of token pairs
