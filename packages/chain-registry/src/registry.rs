@@ -132,6 +132,7 @@ impl ChainRegistry {
     pub fn add_chain(&mut self, config: ChainConfig) -> Result<()> {
         let chain_id = ChainId::from_str(&config.chain_id)?;
         self.config.chains.insert(chain_id.to_string(), config);
+        self.config.validate()?;
         Ok(())
     }
 
@@ -191,6 +192,7 @@ impl ChainRegistry {
     pub fn add_asset(&mut self, config: AssetConfig) -> Result<()> {
         let asset_id_str = config.asset_id_base.to_string();
         self.config.assets.insert(asset_id_str, config);
+        self.config.validate()?;
         Ok(())
     }
 
@@ -302,6 +304,7 @@ impl ChainRegistry {
         }
 
         self.config.token_pairs.push(pair);
+        self.config.validate()?;
         Ok(())
     }
 
@@ -423,6 +426,7 @@ impl ChainRegistry {
             })?;
 
         pair.enabled = enabled;
+        self.config.validate()?;
         Ok(())
     }
 }
@@ -447,17 +451,6 @@ impl RegistryConfig {
                     "Chain ID mismatch: key '{}' != chain_id '{}'",
                     id, chain.chain_id
                 )));
-            }
-
-            // Verify all assets in this chain's assets list exist in the global assets config
-            for asset_id_base in &chain.assets {
-                let asset_id_str = asset_id_base.to_string();
-                if !self.assets.contains_key(&asset_id_str) {
-                    return Err(ChainRegistryError::ConfigError(format!(
-                        "Asset '{}' referenced in chain '{}' is not defined in global assets configuration",
-                        asset_id_str, chain.chain_id
-                    )));
-                }
             }
         }
 
