@@ -8,6 +8,9 @@ keywords = ["blockchain", "registry", "configuration"]
 categories = ["web-programming"]
 repository = "https://github.com/mycel-labs/atp"
 
+[lib]
+name = "atp_chain_registry"
+path = "src/lib.rs"
 
 [dependencies]
 atp-caip = { workspace = true }

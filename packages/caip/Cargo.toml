@@ -8,7 +8,9 @@ keywords = ["caip", "blockchain", "protocol"]
 categories = ["web-programming"]
 repository = "https://github.com/mycel-labs/atp"
 
-
+[lib]
+name = "atp_caip"
+path = "src/lib.rs"
 
 [dependencies]
 config = "0.15.11"
