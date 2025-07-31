@@ -177,8 +177,9 @@
             '';
 
             installPhase = ''
-              cp target/wasm32-unknown-unknown/release/atp.wasm $out/
-              cp target/wasm32-unknown-unknown/release/atp.did $out/
+              mkdir -p $out/atp
+              cp target/wasm32-unknown-unknown/release/atp.wasm $out/atp/
+              cp target/wasm32-unknown-unknown/release/atp.did $out/atp/
             '';
 
             meta = with pkgs.lib; {
