@@ -2,11 +2,12 @@
 name = "ic-nosql-tests"
 version.workspace = true
 edition = "2021"
+publish = false
 
 [dependencies]
-ic-nosql = { path = "../packages/ic-nosql" }
-example-canister = { path = "../packages/ic-nosql/example-canister" }
-atp = { path = "../src/atp" }
+ic-nosql = { workspace = true }
+example-canister = { workspace = true }
+atp = { workspace = true }
 
 candid = "0.10"
 serde = { version = "1.0", features = ["derive"] }

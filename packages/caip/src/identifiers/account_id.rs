@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
 
-use crate::ChainId;
 use crate::error::{CaipError, Result};
 use crate::validation::ACCOUNT_ID_REGEX;
+use crate::ChainId;
 
 /// CAIP-10 Account ID
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]

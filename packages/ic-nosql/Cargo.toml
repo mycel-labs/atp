@@ -6,6 +6,7 @@ description = "A flexible NoSQL database library for Internet Computer canisters
 license = "MIT"
 keywords = ["internet-computer", "nosql", "database", "ic", "canister"]
 categories = ["database", "web-programming"]
+repository = "https://github.com/mycel-labs/atp"
 
 [lib]
 name = "ic_nosql"

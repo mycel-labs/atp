@@ -2,6 +2,13 @@
 name = "caip"
 edition = "2021"
 version.workspace = true
+description = "Chain Agnostic Improvement Proposals (CAIP) implementation"
+license = "MIT"
+keywords = ["caip", "blockchain", "protocol"]
+categories = ["web-programming"]
+repository = "https://github.com/mycel-labs/atp"
+
+
 
 [dependencies]
 config = "0.15.11"
