@@ -18,6 +18,7 @@ target/
 
 # output
 result/
+result
 
 # frontend code
 node_modules/
