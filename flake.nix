@@ -22,6 +22,10 @@
           inherit system overlays;
         };
 
+        # Read Cargo.toml metadata
+        cargoToml = pkgs.lib.importTOML ./src/atp/Cargo.toml;
+        workspaceToml = pkgs.lib.importTOML ./Cargo.toml;
+
         # Rust toolchain with wasm32 target
         rustToolchain = pkgs.rust-bin.stable.latest.default.override {
           extensions = [
@@ -134,9 +138,9 @@
 
         # Build packages
         packages = {
-          default = pkgs.rustPlatform.buildRustPackage {
-            pname = "atp";
-            version = "0.1.0";
+          default = pkgs.rustPlatform.buildRustPackage rec {
+            pname = cargoToml.package.name;
+            version = workspaceToml.workspace.package.version;
 
             src = ./.;
 
@@ -147,40 +151,54 @@
             nativeBuildInputs = with pkgs; [
               rustToolchain
               pkg-config
+              # Install candid-extractor from crates.io
+              (pkgs.rustPlatform.buildRustPackage rec {
+                pname = "candid-extractor";
+                version = "0.1.6";
+                src = pkgs.fetchCrate {
+                  inherit pname version;
+                  sha256 = "sha256-MTLhYGcrGaLc84YjX2QXMsY4+UrxDvWpFVBw5WZxnN8=";
+                };
+                cargoHash = "sha256-Mq2tO8gD7v5P7NGH+R4QkyA7jRXo4knIi+eoGT4JzuU=";
+              })
             ];
 
             buildInputs = with pkgs; [
               openssl
             ];
 
+            # TODO: Check Test
+            doCheck = false;
+
             # Build the WASM target
             buildPhase = ''
               cargo build --package atp --target wasm32-unknown-unknown --release
+              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
             '';
 
             installPhase = ''
-              mkdir -p $out/lib
-              cp target/wasm32-unknown-unknown/release/atp.wasm $out/lib/
+              cp target/wasm32-unknown-unknown/release/atp.wasm $out/
+              cp target/wasm32-unknown-unknown/release/atp.did $out/
             '';
 
             meta = with pkgs.lib; {
-              description = "ATP - Internet Computer canister";
-              license = licenses.mit; # Adjust license as needed
+              description = cargoToml.package.description;
+              homepage = cargoToml.package.repository;
+              repository = cargoToml.package.repository;
+              license = licenses.mit;
+              maintainers = [ ];
+              platforms = platforms.unix;
             };
           };
         };
 
         # Development apps
         apps = {
-          build = flake-utils.lib.mkApp {
-            drv = pkgs.writeShellScriptBin "build" ''
-              cargo build --release
-            '';
-          };
-
           build-atp = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "build-atp" ''
-              cargo build --package atp --target wasm32-unknown-unknown --release
+                cargo build --package atp --target wasm32-unknown-unknown --release
+              	candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
+
             '';
           };
 

@@ -16,6 +16,9 @@
 # rust
 target/
 
+# output
+result/
+
 # frontend code
 node_modules/
 dist/
