@@ -10,7 +10,7 @@ pub use registry::{ChainRegistry, DEFAULT_CONFIG};
 pub use types::*;
 
 // Re-export CAIP types for convenience
-pub use solveros_caip::{AssetId, AssetIdBase, ChainId, Curve, TokenPair};
+pub use caip::{AssetId, AssetIdBase, ChainId, Curve, TokenPair};
 
 #[cfg(test)]
 mod integration_tests {

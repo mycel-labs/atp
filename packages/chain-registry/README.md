@@ -28,7 +28,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-solveros-chain-registry = "0.1.0"
+chain-registry = "0.1.0"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
 ```
@@ -36,7 +36,7 @@ toml = "0.8"
 ### Basic Usage
 
 ```rust
-use solveros_chain_registry::{ChainRegistry, ChainId, AssetId};
+use chain_registry::{ChainRegistry, ChainId, AssetId};
 use std::str::FromStr;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -140,7 +140,7 @@ The registry is designed to be easily extensible. Add support for new chains by:
 
 ### Programmatic Configuration
 ```rust
-use solveros_chain_registry::*;
+use chain_registry::*;
 
 let mut registry = ChainRegistry::new();
 
@@ -278,23 +278,3 @@ match registry.get_chain(&chain_id) {
 }
 ```
 
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
-### Development Setup
-
-```bash
-git clone https://github.com/your-org/chain-registry.git
-cd chain-registry
-cargo build
-cargo test
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-Built with ❤️ for the multi-chain future.

@@ -1,10 +1,10 @@
-# SolverOS CAIP
+# CAIP
 
 A Rust implementation of Chain Agnostic Improvement Proposals (CAIP) standards for blockchain interoperability. This crate provides standardized identifiers and primitives for working with multiple blockchain networks in a chain-agnostic manner.
 
 ## Overview
 
-SolverOS CAIP implements the following CAIP standards:
+CAIP implements the following CAIP standards:
 
 - **CAIP-2**: Chain ID specification for blockchain identification
 - **CAIP-10**: Account ID specification for blockchain account identification  
@@ -24,20 +24,20 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-solveros-caip = { path = "../solveros-caip" }
+caip = { path = "../caip" }
 ```
 
 Or if published to crates.io:
 
 ```toml
 [dependencies]
-solveros-caip = "0.1.0"
+caip = "0.1.0"
 ```
 
 ## Quick Start
 
 ```rust
-use solveros_caip::{ChainId, AssetId, Money, TokenPair};
+use caip::{ChainId, AssetId, Money, TokenPair};
 use std::str::FromStr;
 
 // Create chain identifiers
@@ -68,7 +68,7 @@ println!("Cross-chain pair: {}", cross_chain_pair.is_cross_chain()); // true
 Chain IDs follow the format `namespace:reference` and identify specific blockchain networks:
 
 ```rust
-use solveros_caip::ChainId;
+use caip::ChainId;
 
 // Ethereum mainnet
 let ethereum = ChainId::new("eip155", "1")?;
@@ -89,7 +89,7 @@ assert_eq!(chain.reference(), "1");
 Asset IDs follow the format `chain_id/asset_namespace:asset_reference`:
 
 ```rust
-use solveros_caip::{AssetId, AssetIdBase, ChainId};
+use caip::{AssetId, AssetIdBase, ChainId};
 
 let ethereum = ChainId::new("eip155", "1")?;
 
@@ -115,7 +115,7 @@ assert_eq!(asset_base.to_string(), "slip44:60");
 Account IDs follow the format `chain_id:account_address`:
 
 ```rust
-use solveros_caip::{AccountId, ChainId};
+use caip::{AccountId, ChainId};
 
 let ethereum = ChainId::new("eip155", "1")?;
 let account = AccountId::new(
@@ -134,7 +134,7 @@ assert_eq!(account.account_address(), "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcd
 The `Money` type provides precise decimal arithmetic for cryptocurrency amounts:
 
 ```rust
-use solveros_caip::Money;
+use caip::Money;
 use ethers_core::types::U256;
 
 // Create from decimal string (human-readable)
@@ -172,7 +172,7 @@ assert!(Money::zero(18)?.is_zero());
 Combines an asset identifier with a money amount:
 
 ```rust
-use solveros_caip::{Asset, AssetId, Money, ChainId};
+use caip::{Asset, AssetId, Money, ChainId};
 
 let ethereum = ChainId::new("eip155", "1")?;
 let eth_id = AssetId::new(ethereum, "slip44", "60")?;
@@ -190,7 +190,7 @@ assert_eq!(usd_value, 7500.0); // 2.5 * 3000
 Represent trading relationships between two assets:
 
 ```rust
-use solveros_caip::{TokenPair, AssetId, ChainId};
+use caip::{TokenPair, AssetId, ChainId};
 
 let ethereum = ChainId::new("eip155", "1")?;
 let solana = ChainId::new("solana", "mainnet")?;
@@ -227,7 +227,7 @@ assert_eq!(parsed_pair, pair);
 Predefined enums for common blockchain and asset namespaces:
 
 ```rust
-use solveros_caip::{ChainNamespace, AssetNamespace};
+use caip::{ChainNamespace, AssetNamespace};
 
 // Chain namespaces
 let evm_chains = ChainNamespace::Eip155;
@@ -250,7 +250,7 @@ assert_eq!(erc20_tokens.as_str(), "erc20");
 Support for different cryptographic signature algorithms:
 
 ```rust
-use solveros_caip::Curve;
+use caip::Curve;
 
 let ethereum_curve = Curve::Secp256k1;
 let solana_curve = Curve::Ed25519;
@@ -261,7 +261,7 @@ let solana_curve = Curve::Ed25519;
 Comprehensive error types for validation and parsing failures:
 
 ```rust
-use solveros_caip::{CaipError, ChainId, AssetId, Money};
+use caip::{CaipError, ChainId, AssetId, Money};
 
 // Invalid chain ID format
 match ChainId::new("", "1") {
@@ -305,8 +305,8 @@ This crate is designed to work seamlessly with `solveros-chain-registry`:
 
 ```rust
 // The chain registry uses CAIP types for configuration
-use solveros_chain_registry::ChainRegistry;
-use solveros_caip::{AssetId, ChainId};
+use chain_registry::ChainRegistry;
+use caip::{AssetId, ChainId};
 
 let registry = ChainRegistry::default()?;
 
@@ -320,7 +320,7 @@ for route in routes {
 }
 
 // Get chains supporting specific cryptographic curves
-let secp256k1_chains = registry.get_chains_by_curve(&solveros_caip::Curve::Secp256k1);
+let secp256k1_chains = registry.get_chains_by_curve(&caip::Curve::Secp256k1);
 ```
 
 ## Serialization
@@ -328,7 +328,7 @@ let secp256k1_chains = registry.get_chains_by_curve(&solveros_caip::Curve::Secp2
 All types support Serde serialization for configuration files and APIs:
 
 ```rust
-use solveros_caip::{ChainId, AssetId, TokenPair};
+use caip::{ChainId, AssetId, TokenPair};
 use serde_json;
 
 let chain = ChainId::new("eip155", "1")?;
@@ -367,7 +367,7 @@ The crate includes comprehensive tests covering:
 ### Cross-Chain Trading Scenario
 
 ```rust
-use solveros_caip::{ChainId, AssetId, Money, Asset, TokenPair};
+use caip::{ChainId, AssetId, Money, Asset, TokenPair};
 
 // Set up chains
 let ethereum = ChainId::new("eip155", "1")?;
@@ -404,7 +404,7 @@ println!("Is cross-chain: {}", trading_pair.is_cross_chain());
 ### Multi-Chain Asset Management
 
 ```rust
-use solveros_caip::{ChainId, AssetId, AssetIdBase, Money};
+use caip::{ChainId, AssetId, AssetIdBase, Money};
 use std::collections::HashMap;
 
 // Define supported chains

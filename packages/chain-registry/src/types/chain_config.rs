@@ -1,5 +1,5 @@
+use caip::{AssetIdBase, Curve};
 use serde::{Deserialize, Serialize};
-use solveros_caip::{AssetIdBase, Curve};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,5 +1,5 @@
+use caip::AssetIdBase;
 use serde::{Deserialize, Serialize};
-use solveros_caip::AssetIdBase;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

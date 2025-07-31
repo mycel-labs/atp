@@ -1,4 +1,4 @@
-use solveros_caip::{AssetId, AssetIdBase, ChainId, Curve, TokenPair};
+use caip::{AssetId, AssetIdBase, ChainId, Curve, TokenPair};
 use std::str::FromStr;
 
 use crate::error::{ChainRegistryError, Result};

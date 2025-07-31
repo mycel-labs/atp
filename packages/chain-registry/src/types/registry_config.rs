@@ -1,5 +1,5 @@
+use caip::TokenPair;
 use serde::{Deserialize, Serialize};
-use solveros_caip::TokenPair;
 use std::collections::HashMap;
 
 use crate::types::{AssetConfig, ChainConfig};

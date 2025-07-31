@@ -1,4 +1,4 @@
-use solveros_caip::CaipError;
+use caip::CaipError;
 use thiserror::Error;
 
 #[derive(Error, Debug)]

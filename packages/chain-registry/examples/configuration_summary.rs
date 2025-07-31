@@ -1,4 +1,4 @@
-use solveros_chain_registry::{ChainId, ChainRegistry};
+use chain_registry::{ChainId, ChainRegistry};
 use std::str::FromStr;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

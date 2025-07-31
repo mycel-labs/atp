@@ -2,10 +2,15 @@
 members = [
     "src/atp",
     "packages/ic-nosql",
+    "packages/caip",
+    "packages/chain-registry",
     "packages/ic-nosql/example-canister",
     "tests"
 ]
 resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
 
 [workspace.dependencies]
 ic-nosql = { path = "packages/ic-nosql" }

@@ -1,4 +1,4 @@
-use solveros_caip::{AssetId, AssetIdBase, ChainId, TokenPair};
+use caip::{AssetId, AssetIdBase, ChainId, TokenPair};
 use std::fs;
 use std::path::Path;
 use std::str::FromStr;
@@ -71,7 +71,7 @@ impl ChainRegistry {
     }
 
     /// * `Result<()>` - Success or ChainRegistryError if file writing fails
-    /// use solveros_chain_registry::ChainRegistry;
+    /// use chain_registry::ChainRegistry;
     /// let registry = ChainRegistry::new();
     /// registry.save_to_file("my_config.toml").unwrap();
     pub fn save_to_file(&self, path: impl AsRef<Path>) -> Result<()> {
@@ -90,7 +90,7 @@ impl ChainRegistry {
     }
 
     /// * `Result<String>` - TOML representation of the registry, or ChainRegistryError if serialization fails
-    /// use solveros_chain_registry::ChainRegistry;
+    /// use chain_registry::ChainRegistry;
     /// let registry = ChainRegistry::new();
     /// let toml_string = registry.to_toml().unwrap();
     pub fn to_toml(&self) -> Result<String> {
@@ -100,7 +100,7 @@ impl ChainRegistry {
     }
 
     /// * `Result<String>` - JSON representation of the registry, or ChainRegistryError if serialization fails
-    /// use solveros_chain_registry::ChainRegistry;
+    /// use chain_registry::ChainRegistry;
     /// let registry = ChainRegistry::new();
     /// let json_string = registry.to_json().unwrap();
     pub fn to_json(&self) -> Result<String> {
@@ -120,7 +120,7 @@ impl ChainRegistry {
         &mut self.config
     }
 
-    /// use solveros_caip::{AssetIdBase, Curve};
+    /// use caip::{AssetIdBase, Curve};
     /// use std::collections::HashMap;
     /// let mut registry = ChainRegistry::new();
     /// let chain_config = ChainConfig {
@@ -264,8 +264,8 @@ impl ChainRegistry {
     }
 
     /// * `Result<()>` - Success or ChainRegistryError if assets don't exist or pair already exists
-    /// use solveros_chain_registry::ChainRegistry;
-    /// use solveros_caip::{AssetId, ChainId, TokenPair};
+    /// use chain_registry::ChainRegistry;
+    /// use caip::{AssetId, ChainId, TokenPair};
     /// use std::str::FromStr;
     /// let mut registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -311,8 +311,8 @@ impl ChainRegistry {
     }
 
     /// * `Result<TokenPair>` - The removed trading pair, or ChainRegistryError if not found
-    /// use solveros_chain_registry::ChainRegistry;
-    /// use solveros_caip::{AssetId, ChainId};
+    /// use chain_registry::ChainRegistry;
+    /// use caip::{AssetId, ChainId};
     /// use std::str::FromStr;
     /// let mut registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -340,8 +340,8 @@ impl ChainRegistry {
         Ok(self.config.token_pairs.remove(index))
     }
 
-    /// use solveros_chain_registry::ChainRegistry;
-    /// use solveros_caip::{AssetId, ChainId};
+    /// use chain_registry::ChainRegistry;
+    /// use caip::{AssetId, ChainId};
     /// use std::str::FromStr;
     /// let registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -360,8 +360,8 @@ impl ChainRegistry {
     /// let sol_chain = ChainId::from_str("solana:mainnet").unwrap();
     /// let eth = AssetId::new(eth_chain, "slip44", "60").unwrap();
     /// let sol = AssetId::new(sol_chain, "slip44", "501").unwrap();
-    /// use solveros_chain_registry::ChainRegistry;
-    /// use solveros_caip::{AssetId, ChainId};
+    /// use chain_registry::ChainRegistry;
+    /// use caip::{AssetId, ChainId};
     /// use std::str::FromStr;
     /// let mut registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -379,14 +379,14 @@ impl ChainRegistry {
             .find(|pair| pair.from_asset == *from_asset && pair.to_asset == *to_asset)
     }
 
-    /// use solveros_chain_registry::ChainRegistry;
+    /// use chain_registry::ChainRegistry;
     /// let registry = ChainRegistry::default().unwrap();
     /// assert!(!pairs.is_empty());
     pub fn list_token_pairs(&self) -> Vec<&TokenPair> {
         self.config.token_pairs.iter().collect()
     }
 
-    /// use solveros_chain_registry::ChainRegistry;
+    /// use chain_registry::ChainRegistry;
     /// let registry = ChainRegistry::default().unwrap();
     /// assert!(!enabled_pairs.is_empty());
     pub fn list_enabled_token_pairs(&self) -> Vec<&TokenPair> {
@@ -399,8 +399,8 @@ impl ChainRegistry {
 
     /// Enables or disables a trading pair.
     /// * `Result<()>` - Success or ChainRegistryError if the pair is not found
-    /// use solveros_chain_registry::ChainRegistry;
-    /// use solveros_caip::{AssetId, ChainId};
+    /// use chain_registry::ChainRegistry;
+    /// use caip::{AssetId, ChainId};
     /// use std::str::FromStr;
     /// let mut registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -437,7 +437,7 @@ impl Default for ChainRegistry {
 // Validation implementation
 impl RegistryConfig {
     /// * `Result<()>` - Success or ChainRegistryError if validation fails
-    /// use solveros_chain_registry::RegistryConfig;
+    /// use chain_registry::RegistryConfig;
     /// config.validate().unwrap();
     pub fn validate(&self) -> Result<()> {
         // Validate all chain and asset IDs
@@ -508,7 +508,7 @@ impl RegistryConfig {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use solveros_caip::{AssetIdBase, Curve};
+    use caip::{AssetIdBase, Curve};
     use std::collections::HashMap;
 
     #[test]

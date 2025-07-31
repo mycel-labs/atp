@@ -1,10 +1,10 @@
 [package]
 name = "chain-registry"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition = "2021"
 
 [dependencies]
-solveros-caip = { path = "../solveros-caip" }
+caip = { path = "../caip" }
 config = "0.15.11"
 ethers-core = "2.0.14"
 serde = "1.0.219"
