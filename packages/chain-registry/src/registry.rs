@@ -1,4 +1,4 @@
-use caip::{AssetId, AssetIdBase, ChainId, TokenPair};
+use atp_caip::{AssetId, AssetIdBase, ChainId, TokenPair};
 use std::fs;
 use std::path::Path;
 use std::str::FromStr;
@@ -120,7 +120,7 @@ impl ChainRegistry {
         &mut self.config
     }
 
-    /// use caip::{AssetIdBase, Curve};
+    /// use atp_caip::{AssetIdBase, Curve};
     /// use std::collections::HashMap;
     /// let mut registry = ChainRegistry::new();
     /// let chain_config = ChainConfig {
@@ -265,7 +265,7 @@ impl ChainRegistry {
 
     /// * `Result<()>` - Success or ChainRegistryError if assets don't exist or pair already exists
     /// use chain_registry::ChainRegistry;
-    /// use caip::{AssetId, ChainId, TokenPair};
+    /// use atp_caip::{AssetId, ChainId, TokenPair};
     /// use std::str::FromStr;
     /// let mut registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -312,7 +312,7 @@ impl ChainRegistry {
 
     /// * `Result<TokenPair>` - The removed trading pair, or ChainRegistryError if not found
     /// use chain_registry::ChainRegistry;
-    /// use caip::{AssetId, ChainId};
+    /// use atp_caip::{AssetId, ChainId};
     /// use std::str::FromStr;
     /// let mut registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -341,7 +341,7 @@ impl ChainRegistry {
     }
 
     /// use chain_registry::ChainRegistry;
-    /// use caip::{AssetId, ChainId};
+    /// use atp_caip::{AssetId, ChainId};
     /// use std::str::FromStr;
     /// let registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -361,7 +361,7 @@ impl ChainRegistry {
     /// let eth = AssetId::new(eth_chain, "slip44", "60").unwrap();
     /// let sol = AssetId::new(sol_chain, "slip44", "501").unwrap();
     /// use chain_registry::ChainRegistry;
-    /// use caip::{AssetId, ChainId};
+    /// use atp_caip::{AssetId, ChainId};
     /// use std::str::FromStr;
     /// let mut registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -400,7 +400,7 @@ impl ChainRegistry {
     /// Enables or disables a trading pair.
     /// * `Result<()>` - Success or ChainRegistryError if the pair is not found
     /// use chain_registry::ChainRegistry;
-    /// use caip::{AssetId, ChainId};
+    /// use atp_caip::{AssetId, ChainId};
     /// use std::str::FromStr;
     /// let mut registry = ChainRegistry::default().unwrap();
     /// let eth_chain = ChainId::from_str("eip155:1").unwrap();
@@ -508,7 +508,7 @@ impl RegistryConfig {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use caip::{AssetIdBase, Curve};
+    use atp_caip::{AssetIdBase, Curve};
     use std::collections::HashMap;
 
     #[test]

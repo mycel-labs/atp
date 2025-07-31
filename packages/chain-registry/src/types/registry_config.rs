@@ -1,4 +1,4 @@
-use caip::TokenPair;
+use atp_caip::TokenPair;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 

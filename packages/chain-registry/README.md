@@ -1,8 +1,4 @@
-# Chain Registry
-
-[![Rust](https://img.shields.io/badge/rust-1.70+-blue.svg)](https://www.rust-lang.org)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-
+# ATP Chain Registry
 A comprehensive, type-safe chain registry for multi-chain applications, designed for SolverOS and cross-chain arbitrage systems. Built with Rust and following CAIP (Chain Agnostic Improvement Proposals) standards.
 
 ## 🎯 Overview

@@ -1,8 +1,8 @@
 [package]
-name = "caip"
+name = "atp-caip"
 edition = "2021"
 version.workspace = true
-description = "Chain Agnostic Improvement Proposals (CAIP) implementation"
+description = "Chain Agnostic Improvement Proposals (CAIP) implementation for ATP(Account Transfer Protocol)"
 license = "MIT"
 keywords = ["caip", "blockchain", "protocol"]
 categories = ["web-programming"]

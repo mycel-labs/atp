@@ -1,10 +1,10 @@
-# CAIP
+# ATP CAIP
 
 A Rust implementation of Chain Agnostic Improvement Proposals (CAIP) standards for blockchain interoperability. This crate provides standardized identifiers and primitives for working with multiple blockchain networks in a chain-agnostic manner.
 
 ## Overview
 
-CAIP implements the following CAIP standards:
+ATP CAIP implements the following CAIP standards:
 
 - **CAIP-2**: Chain ID specification for blockchain identification
 - **CAIP-10**: Account ID specification for blockchain account identification  
@@ -21,13 +21,6 @@ The crate enables developers to build cross-chain applications by providing:
 ## Installation
 
 Add this to your `Cargo.toml`:
-
-```toml
-[dependencies]
-caip = { path = "../caip" }
-```
-
-Or if published to crates.io:
 
 ```toml
 [dependencies]

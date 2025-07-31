@@ -1,4 +1,4 @@
-use caip::{AssetIdBase, Curve};
+use atp_caip::{AssetIdBase, Curve};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
