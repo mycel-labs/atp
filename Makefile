@@ -1,5 +1,5 @@
 # IC Nix environment version
-IC_NIX_VERSION := latest
+IC_NIX_VERSION := 20250627
 
 .PHONY: all build build-atp generate-did-atp test test-package nix-shell-env clean install-tools help 
 # Default target
@@ -19,19 +19,19 @@ generate-did-atp: build-atp
 
 # Setup nix environment and run tests
 test:
-	nix-shell https://github.com/ninegua/ic-nix/releases/$(IC_NIX_VERSION)/download/dfx-env.tar.gz --run '\
+	nix-shell https://github.com/ninegua/ic-nix/releases/download/$(IC_NIX_VERSION)/dfx-env.tar.gz --run '\
 		export POCKET_IC_BIN=$$(which pocket-ic) && \
 		cargo test'
 
 # Run tests for specific package
 test-package:
-	nix-shell https://github.com/ninegua/ic-nix/releases/$(IC_NIX_VERSION)/download/dfx-env.tar.gz --run '\
+	nix-shell https://github.com/ninegua/ic-nix/releases/download/$(IC_NIX_VERSION)/dfx-env.tar.gz --run '\
 		export POCKET_IC_BIN=$$(which pocket-ic) && \
 		cargo test --package ic-nosql-tests'
 
 # Enter nix-shell with POCKET_IC_BIN exported
 nix-shell-env:
-	nix-shell https://github.com/ninegua/ic-nix/releases/$(IC_NIX_VERSION)/download/dfx-env.tar.gz --run '\
+	nix-shell https://github.com/ninegua/ic-nix/releases/download/$(IC_NIX_VERSION)/dfx-env.tar.gz --run '\
 		export POCKET_IC_BIN=$$(which pocket-ic) && \
 		echo "Environment ready. POCKET_IC_BIN=$$POCKET_IC_BIN" && \
 		exec $$SHELL'
@@ -39,7 +39,6 @@ nix-shell-env:
 # Clean build artifacts
 clean:
 	cargo clean
-	rm -f src/atp/atp.did
 
 # Install required tools
 install-tools:
