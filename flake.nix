@@ -195,7 +195,7 @@
 
         # Development apps
         apps = {
-          build = flake-utils.lib.mkApp {
+          build-dev = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "build-atp" ''
                 cargo build --package atp --target wasm32-unknown-unknown --release
               	candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
