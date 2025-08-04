@@ -1,7 +1,8 @@
 use crate::atp::atp_test_utils::*;
 use crate::test_utils::TestDataGenerator;
 use atp::domain::models::account::AccountState;
-use atp::domain::models::signer::{Curve, SignatureAlgorithm};
+use atp::domain::models::signer::SignatureAlgorithm;
+use atp_caip::curve::Curve;
 
 #[test]
 fn test_dex_to_user_complete_flow() -> Result<(), Box<dyn std::error::Error>> {
@@ -29,6 +30,16 @@ fn test_dex_to_user_complete_flow() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(account.account.account_state, AccountState::Locked);
     assert_eq!(account.account.owner, admin_principal.to_string());
     assert_eq!(account.account.approved_address, dex_principal.to_string());
+
+    // Verify eth address generation
+    assert!(!account.account.public_key_hex.is_empty());
+    let eip1559_address = generate_address(&env, &account.account.id, "eip155:1")?;
+    assert!(eip1559_address.address.starts_with("0x"));
+
+    // Verify solana address generation, shoud be error with invalid curve
+    assert!(!account.account.public_key_hex.is_empty());
+    let eip1559_address = generate_address(&env, &account.account.id, "solana:mainnet");
+    assert!(eip1559_address.is_err());
 
     // Step 2: DEX transfers account to user (should succeed as approved address)
     let transferred_account = transfer_account(

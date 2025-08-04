@@ -25,7 +25,11 @@ serde_json = "1.0.133"
 sha3 = "0.10.8"
 ic-web3 = "0.1.7"
 bs58 = "0.5.0"
+
 ic-nosql = { workspace = true }
+atp-chain-utils = { workspace = true }
+atp-caip = { workspace = true }
+atp-chain-registry = { workspace = true }
 
 [dev-dependencies]
 tokio = { version = "1.41.1", features = ["full"] }

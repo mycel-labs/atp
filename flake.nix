@@ -195,7 +195,7 @@
 
         # Development apps
         apps = {
-          build-atp = flake-utils.lib.mkApp {
+          build-dev = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "build-atp" ''
                 cargo build --package atp --target wasm32-unknown-unknown --release
               	candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
@@ -205,6 +205,7 @@
 
           test = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "test" ''
+              cargo build --package atp --target wasm32-unknown-unknown --release
               export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
               cargo test
             '';

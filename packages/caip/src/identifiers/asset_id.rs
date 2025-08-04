@@ -1,3 +1,4 @@
+use candid::CandidType;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
@@ -7,7 +8,7 @@ use crate::error::{CaipError, Result};
 use crate::validation::{ASSET_ID_BASE_REGEX, ASSET_ID_REGEX};
 
 /// CAIP-19 Asset ID
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, CandidType)]
 pub struct AssetId {
     chain_id: ChainId,
     asset_namespace: String,

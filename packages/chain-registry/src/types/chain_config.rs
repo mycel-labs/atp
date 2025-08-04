@@ -15,3 +15,9 @@ pub struct ChainConfig {
     #[serde(default)]
     pub metadata: HashMap<String, toml::Value>,
 }
+
+impl ChainConfig {
+    pub fn is_supported_curve(&self, curve: &Curve) -> bool {
+        self.cryptographic_curve.contains(curve)
+    }
+}

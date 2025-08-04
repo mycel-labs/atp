@@ -1,3 +1,4 @@
+use atp_caip::curve::Curve;
 use candid::Principal;
 use ethers_core::abi::ethereum_types::U256;
 use ethers_core::types::transaction::eip1559::Eip1559TransactionRequest;
@@ -7,7 +8,7 @@ use ethers_core::utils::{hex, keccak256};
 use std::cell::RefCell;
 use std::future::Future;
 
-use crate::domain::models::signer::{Curve, SignatureAlgorithm};
+use crate::domain::models::signer::SignatureAlgorithm;
 use crate::domain::repositories::signer_repository::{
     EcdsaKeyId, EcdsaKeyIdCurve, EcdsaPublicKeyRequest, EcdsaSignatureRequest, ISignerRepository,
     PublicKeyReply, SchnorrKeyId, SchnorrKeyIdAlgorithm, SchnorrPublicKeyRequest,

@@ -1,15 +1,17 @@
+use atp_caip::curve::Curve;
 use candid::Principal;
 use ethers_core::types::transaction::eip1559::Eip1559TransactionRequest;
 
 use crate::application::dtos::account_messages::*;
 use crate::application::dtos::account_reply::AccountReply;
 use crate::domain::models::account::{Account, AccountState};
-use crate::domain::models::signer::{Curve, SignatureAlgorithm};
+use crate::domain::models::signer::SignatureAlgorithm;
 use crate::domain::repositories::account_repository::IAccountRepository;
 use crate::domain::repositories::signer_repository::ISignerRepository;
 use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
-use crate::utils::eth_utils::{generate_eth_address_from_sec1, sha256};
+use crate::utils::config::get_chain_registry;
+use crate::utils::eth_utils::sha256;
 
 pub struct AccountService {
     account_repository: AccountRepositoryImpl,
@@ -190,23 +192,42 @@ impl AccountService {
         }
     }
 
-    pub fn get_eth_address(
+    /// Generate a blockchain address for any supported chain
+    ///
+    /// This unified method replaces chain-specific address generation methods.
+    /// It supports multiple blockchains through CAIP chain identifiers.
+    pub fn generate_address(
         &self,
-        request: GetEthAddressRequest,
-    ) -> Result<GetEthAddressResponse, String> {
+        request: GenerateAddressRequest,
+    ) -> Result<GenerateAddressResponse, String> {
         // Check if the account exists
         let account = self.account_repository.get(&request.account_id)?;
+        // Generate a wildcard chain ID
+        let chain_id_wildcard = request
+            .chain_id
+            .to_wildcard()
+            .map_err(|e| format!("Invalid chain ID {}: {}", request.chain_id, e))?;
 
-        // Check if the signature algorithm is ECDSA
-        if account.algorithm().clone() != SignatureAlgorithm::Ecdsa {
-            return Err("Signature algorithm is not ECDSA".to_string());
-        }
-        // Check if the curve is secp256k1
-        if account.curve().clone() != Curve::Secp256k1 {
-            return Err("Curve is not secp256k1".to_string());
+        // Check curve compatibility
+        let registry = get_chain_registry()?;
+        let chain_config = registry
+            .get_chain(&chain_id_wildcard)
+            .map_err(|e| format!("Chain {} not found: {}", request.chain_id, e))?;
+        if !chain_config.is_supported_curve(account.curve()) {
+            return Err(format!(
+                "Curve {} is not supported for chain {}",
+                account.curve(),
+                request.chain_id
+            ));
         }
 
-        let address = generate_eth_address_from_sec1(account.public_key().clone())?;
-        Ok(GetEthAddressResponse { address })
+        // Convert public key to hex string for chain-utils
+        let pub_key_hex = hex::encode(account.public_key());
+
+        // Generate address using chain-utils
+        let address = atp_chain_utils::address::generate_address(pub_key_hex, request.chain_id)
+            .map_err(|e| format!("Failed to generate address: {}", e))?;
+
+        Ok(GenerateAddressResponse { address })
     }
 }
