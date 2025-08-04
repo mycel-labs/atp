@@ -1,3 +1,4 @@
+use candid::CandidType;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
@@ -6,7 +7,7 @@ use crate::error::{CaipError, Result};
 use crate::validation::CHAIN_ID_REGEX;
 
 /// CAIP-2 Chain ID
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, CandidType)]
 pub struct ChainId {
     chain_namespace: String,
     chain_reference: String,

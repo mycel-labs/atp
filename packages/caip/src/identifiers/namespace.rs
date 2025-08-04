@@ -1,11 +1,12 @@
+use candid::CandidType;
 /// Common chain namespaces
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, CandidType)]
 pub enum ChainNamespace {
     Eip155,   // Ethereum and EVM-compatible chains
     Solana,   // Solana
     Cosmos,   // Cosmos chains
     Polkadot, // Polkadot chains
-    Bitcoin,  // Bitcoin
+    Bip155,   // Bitcoin and Bitcoin-compatible chains
     Other(&'static str),
 }
 
@@ -16,7 +17,7 @@ impl ChainNamespace {
             Self::Solana => "solana",
             Self::Cosmos => "cosmos",
             Self::Polkadot => "polkadot",
-            Self::Bitcoin => "bitcoin",
+            Self::Bip155 => "bip155",
             Self::Other(s) => s,
         }
     }
@@ -29,7 +30,7 @@ impl From<ChainNamespace> for String {
 }
 
 /// Common asset namespaces
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, CandidType)]
 pub enum AssetNamespace {
     Slip44,  // Native tokens
     Erc20,   // ERC-20 tokens
@@ -68,7 +69,7 @@ mod tests {
         assert_eq!(ChainNamespace::Solana.as_str(), "solana");
         assert_eq!(ChainNamespace::Cosmos.as_str(), "cosmos");
         assert_eq!(ChainNamespace::Polkadot.as_str(), "polkadot");
-        assert_eq!(ChainNamespace::Bitcoin.as_str(), "bitcoin");
+        assert_eq!(ChainNamespace::Bip155.as_str(), "bip155");
         assert_eq!(ChainNamespace::Other("custom").as_str(), "custom");
 
         let ns_str: String = ChainNamespace::Eip155.into();

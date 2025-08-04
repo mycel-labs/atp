@@ -1,3 +1,4 @@
+use candid::CandidType;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::str::FromStr;
@@ -7,7 +8,7 @@ use crate::validation::ACCOUNT_ID_REGEX;
 use crate::ChainId;
 
 /// CAIP-10 Account ID
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, CandidType)]
 pub struct AccountId {
     chain_id: ChainId,
     account_address: String,
