@@ -106,15 +106,54 @@ Response:
 - `SignEip1559TransactionResponse` containing hex-encoded signed transaction on success
 - Error message on failure
 
-### get_eth_address
+## Address Generation
+
+### generate_address
 ```candid
-get_eth_address: (request: GetEthAddressRequest) -> (variant { Ok: GetEthAddressResponse; Err: text; }) query;
+generate_address: (request: GenerateAddressRequest) -> (variant { Ok: GenerateAddressResponse; Err: text; }) query;
 ```
-Retrieves the Ethereum address derived from the account's public key. Anyone can call this method.
+Generates a blockchain address for any supported chain using CAIP chain identifiers. This unified endpoint replaces chain-specific address generation methods. Anyone can call this method.
 
 Request:
 - `account_id`: ID of the account
+- `chain_id`: CAIP-2 chain identifier specifying the target blockchain
 
 Response:
-- `GetEthAddressResponse` containing hex-encoded Ethereum address on success
+- `GenerateAddressResponse` containing the generated blockchain address on success
 - Error message on failure
+
+#### Examples
+
+**Ethereum Mainnet Address:**
+```candid
+{
+  account_id = "your_account_id";
+  chain_id = {
+    chain_namespace = "eip155";
+    chain_reference = "1";
+  };
+}
+```
+
+**Bitcoin Mainnet Address:**
+```candid
+{
+  account_id = "your_account_id";
+  chain_id = {
+    chain_namespace = "bip122";
+    chain_reference = "000000000019d6689c085ae165831e93";
+  };
+}
+```
+
+**Solana Mainnet Address:**
+```candid
+{
+  account_id = "your_account_id";
+  chain_id = {
+    chain_namespace = "solana";
+    chain_reference = "mainnet";
+  };
+}
+```
+

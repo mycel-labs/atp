@@ -1,6 +1,7 @@
 use crate::application::dtos::account_reply::AccountReply;
 use crate::application::dtos::eip1559::Eip1559TransactionRequestDTO;
 use crate::domain::models::signer::{Curve, SignatureAlgorithm};
+use atp_caip::chain_id::ChainId;
 use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
 
@@ -86,5 +87,16 @@ pub struct GetEthAddressRequest {
 
 #[derive(CandidType, Clone, Serialize, Deserialize, Debug)]
 pub struct GetEthAddressResponse {
+    pub address: String,
+}
+
+#[derive(CandidType, Clone, Serialize, Deserialize, Debug)]
+pub struct GenerateAddressRequest {
+    pub account_id: String,
+    pub chain_id: ChainId,
+}
+
+#[derive(CandidType, Clone, Serialize, Deserialize, Debug)]
+pub struct GenerateAddressResponse {
     pub address: String,
 }

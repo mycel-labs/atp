@@ -116,17 +116,19 @@ pub async fn sign_eip1559_transaction(
     service.sign_eip1559_transaction(request).await
 }
 
-/// Get the Ethereum address derived from the account's public key
+/// Generate a blockchain address for any supported chain
 ///
-/// The account must use ECDSA signature algorithm and secp256k1 curve.
-/// Anyone can get the Ethereum address.
+/// This unified endpoint supports multiple blockchains through CAIP chain identifiers.
+/// Anyone can generate addresses for any supported chain.
 #[query]
-pub fn get_eth_address(request: GetEthAddressRequest) -> Result<GetEthAddressResponse, String> {
+pub fn generate_address(
+    request: GenerateAddressRequest,
+) -> Result<GenerateAddressResponse, String> {
     let (account_repository, signer_repository) = get_repositories();
     let service = AccountService::new(account_repository, signer_repository);
 
-    // Generate Ethereum address
-    service.get_eth_address(request)
+    // Generate address for the specified chain
+    service.generate_address(request)
 }
 
 // Export the Candid interface
