@@ -114,6 +114,7 @@ dependencies = [
  "candid 0.10.14",
  "config",
  "ethers-core",
+ "ic-stable-structures",
  "lazy_static",
  "regex",
  "serde",
@@ -1529,6 +1530,7 @@ name = "ic-nosql-tests"
 version = "0.1.0"
 dependencies = [
  "atp",
+ "atp-caip",
  "candid 0.10.14",
  "example-canister",
  "hex",

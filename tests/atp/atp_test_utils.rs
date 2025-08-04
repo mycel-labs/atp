@@ -4,7 +4,8 @@
 use crate::test_utils::{TestConfig, TestEnvironment};
 use atp::application::dtos::account_messages::*;
 use atp::application::dtos::eip1559::Eip1559TransactionRequestDTO;
-use atp::domain::models::signer::{Curve, SignatureAlgorithm};
+use atp::domain::models::signer::SignatureAlgorithm;
+use atp_caip::curve::Curve;
 use candid::{Encode, Principal};
 
 // Convenience function to create TestEnvironment for ATP canister

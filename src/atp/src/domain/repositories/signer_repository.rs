@@ -3,7 +3,8 @@ use ethers_core::types::transaction::eip1559::Eip1559TransactionRequest;
 use serde::{Deserialize, Serialize};
 use std::future::Future;
 
-use crate::domain::models::signer::{Curve, SignatureAlgorithm};
+use crate::domain::models::signer::SignatureAlgorithm;
+use atp_caip::curve::Curve;
 
 type CanisterId = Principal;
 

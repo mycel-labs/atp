@@ -1,7 +1,8 @@
 use crate::atp::atp_test_utils::*;
 use crate::test_utils::TestDataGenerator;
 use atp::domain::models::account::AccountState;
-use atp::domain::models::signer::{Curve, SignatureAlgorithm};
+use atp::domain::models::signer::SignatureAlgorithm;
+use atp_caip::curve::Curve;
 
 #[test]
 fn test_dex_to_user_complete_flow() -> Result<(), Box<dyn std::error::Error>> {

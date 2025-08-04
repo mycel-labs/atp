@@ -8,18 +8,25 @@ rpc_endpoints = []
 explorer_url = ""
 cryptographic_curve = ["secp256k1"]
 is_testnet = false
-assets = [
-    { asset_namespace = "slip44", asset_reference = "60" }
-]
+assets = []
 
 [chains."solana:*"]
 chain_id = "solana:*"
 name = "Solana Wildcard Chain"
 native_asset = "slip44:501"
 rpc_endpoints = []
-explorer_url = "https://solscan.io/?cluster=devnet"
+explorer_url = ""
 cryptographic_curve = ["ed25519"]
 is_testnet = false
-assets = [
-    { asset_namespace = "slip44", asset_reference = "501" }
-]
+assets = []
+
+[chains."bip122:*"]
+chain_id = "bip122:*"
+name = "BIP122 Wildcard Chain"
+native_asset = ""
+rpc_endpoints = []
+explorer_url = ""
+cryptographic_curve = ["secp256k1"]
+is_testnet = false
+assets = []
+

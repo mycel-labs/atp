@@ -1,5 +1,6 @@
 use crate::domain::models::account::AccountState;
-use crate::domain::models::signer::{Curve, SignatureAlgorithm};
+use crate::domain::models::signer::SignatureAlgorithm;
+use atp_caip::curve::Curve;
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
 

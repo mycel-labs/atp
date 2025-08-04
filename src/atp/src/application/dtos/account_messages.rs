@@ -1,7 +1,8 @@
 use crate::application::dtos::account_reply::AccountReply;
 use crate::application::dtos::eip1559::Eip1559TransactionRequestDTO;
-use crate::domain::models::signer::{Curve, SignatureAlgorithm};
+use crate::domain::models::signer::SignatureAlgorithm;
 use atp_caip::chain_id::ChainId;
+use atp_caip::curve::Curve;
 use candid::{CandidType, Principal};
 use serde::{Deserialize, Serialize};
 

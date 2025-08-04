@@ -34,6 +34,21 @@ impl ChainId {
         &self.chain_reference
     }
 
+    /// Convert this ChainId to a wildcard version by replacing the reference with "*"
+    /// 
+    /// # Examples
+    /// ```
+    /// use atp_caip::ChainId;
+    /// use std::str::FromStr;
+    /// 
+    /// let chain_id = ChainId::from_str("eip155:1").unwrap();
+    /// let wildcard = chain_id.to_wildcard().unwrap();
+    /// assert_eq!(wildcard.to_string(), "eip155:*");
+    /// ```
+    pub fn to_wildcard(&self) -> Result<Self> {
+        Self::new(&self.chain_namespace, "*")
+    }
+
     fn validate(&self) -> Result<()> {
         let formatted = self.to_string();
         if !CHAIN_ID_REGEX.is_match(&formatted) {
@@ -145,5 +160,26 @@ mod tests {
             ChainId::from_str("eip155:1:extra"),
             Err(CaipError::InvalidChainId(_))
         ));
+    }
+
+    #[test]
+    fn test_to_wildcard() {
+        // Test converting specific chain IDs to wildcard
+        let ethereum_mainnet = ChainId::from_str("eip155:1").unwrap();
+        let ethereum_wildcard = ethereum_mainnet.to_wildcard().unwrap();
+        assert_eq!(ethereum_wildcard.to_string(), "eip155:*");
+        assert_eq!(ethereum_wildcard.namespace(), "eip155");
+        assert_eq!(ethereum_wildcard.reference(), "*");
+
+        let solana_mainnet = ChainId::from_str("solana:mainnet").unwrap();
+        let solana_wildcard = solana_mainnet.to_wildcard().unwrap();
+        assert_eq!(solana_wildcard.to_string(), "solana:*");
+        assert_eq!(solana_wildcard.namespace(), "solana");
+        assert_eq!(solana_wildcard.reference(), "*");
+
+        // Test that already wildcard chains remain unchanged
+        let already_wildcard = ChainId::from_str("eip155:*").unwrap();
+        let still_wildcard = already_wildcard.to_wildcard().unwrap();
+        assert_eq!(still_wildcard.to_string(), "eip155:*");
     }
 }

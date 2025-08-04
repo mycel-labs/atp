@@ -168,11 +168,12 @@ mod account_repository_tests {
     use std::rc::Rc;
 
     use crate::domain::models::account::{Account, AccountState};
-    use crate::domain::models::signer::{Curve, SignatureAlgorithm};
+    use crate::domain::models::signer::SignatureAlgorithm;
     use crate::domain::repositories::account_repository::IAccountRepository;
     use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
     use crate::utils::ic::api::set_ic_api;
     use crate::utils::ic::mock::MockIcApi;
+    use atp_caip::curve::Curve;
 
     // Helper function to create a test account
     fn create_test_account(id: &str, owner: Principal) -> Account {

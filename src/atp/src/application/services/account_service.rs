@@ -1,14 +1,16 @@
+use atp_caip::curve::Curve;
 use candid::Principal;
 use ethers_core::types::transaction::eip1559::Eip1559TransactionRequest;
 
 use crate::application::dtos::account_messages::*;
 use crate::application::dtos::account_reply::AccountReply;
 use crate::domain::models::account::{Account, AccountState};
-use crate::domain::models::signer::{Curve, SignatureAlgorithm};
+use crate::domain::models::signer::SignatureAlgorithm;
 use crate::domain::repositories::account_repository::IAccountRepository;
 use crate::domain::repositories::signer_repository::ISignerRepository;
 use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
+use crate::utils::config::get_chain_registry;
 use crate::utils::eth_utils::sha256;
 
 pub struct AccountService {
@@ -200,8 +202,25 @@ impl AccountService {
     ) -> Result<GenerateAddressResponse, String> {
         // Check if the account exists
         let account = self.account_repository.get(&request.account_id)?;
+        // Generate a wildcard chain ID
+        let chain_id_wildcard = request
+            .chain_id
+            .to_wildcard()
+            .map_err(|e| format!("Invalid chain ID {}: {}", request.chain_id, e))?;
 
-        // TODO: Check curve and algorithm compatibility
+        // Check curve compatibility
+        let registry = get_chain_registry()?;
+        let chain_config = registry
+            .get_chain(&chain_id_wildcard)
+            .map_err(|e| format!("Chain {} not found: {}", request.chain_id, e))?;
+        if !chain_config.is_supported_curve(account.curve()) {
+            return Err(format!(
+                "Curve {} is not supported for chain {}",
+                account.curve(),
+                request.chain_id
+            ));
+        }
+
         // Convert public key to hex string for chain-utils
         let pub_key_hex = hex::encode(account.public_key());
 
