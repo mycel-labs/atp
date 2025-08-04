@@ -6,7 +6,7 @@ members = [
     "packages/ic-nosql",
     "packages/ic-nosql/example-canister",
     "tests"
-]
+, "packages/atp-chain-utils"]
 resolver = "2"
 
 [workspace.package]
