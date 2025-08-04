@@ -1,7 +1,7 @@
 /// Generate a Solana address from a hex-encoded public key.
 ///
-/// This function takes a 32-byte hex-encoded public key (typically generated from 
-/// ICP threshold signatures) and converts it directly to a Solana address using 
+/// This function takes a 32-byte hex-encoded public key (typically generated from
+/// ICP threshold signatures) and converts it directly to a Solana address using
 /// base58 encoding. In Solana, public keys are used directly as addresses.
 ///
 /// # Arguments

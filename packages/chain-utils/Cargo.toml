@@ -15,4 +15,6 @@ k256 = { version = "0.13.4", features = ["ecdsa"] }
 sha3 = "0.10.8"
 hex = "0.4.3"
 bs58 = "0.5.1"
+sha2 = "0.10.9"
+ripemd = "0.1.3"
 

@@ -4,9 +4,9 @@ use sha3::{Digest, Keccak256};
 
 /// Generate an Ethereum address from a SEC1-encoded public key.
 ///
-/// This function takes a hex-encoded SEC1 public key (typically generated from 
-/// ICP threshold signatures) and converts it to an Ethereum address using the 
-/// standard Ethereum address derivation process: Keccak256 hash of the uncompressed 
+/// This function takes a hex-encoded SEC1 public key (typically generated from
+/// ICP threshold signatures) and converts it to an Ethereum address using the
+/// standard Ethereum address derivation process: Keccak256 hash of the uncompressed
 /// public key coordinates, taking the last 20 bytes.
 ///
 /// # Arguments
