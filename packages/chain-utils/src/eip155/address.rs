@@ -70,15 +70,26 @@ pub fn generate_address(pub_key_sec1_string: String) -> Result<String, String> {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_generate_address_valid_key() {
-        let pub_key = "04a34b99f22c790c4e36b2b3c2c35a36db06226e41c692fc82b8b56ac1c540c5bd5b8dec5235a0fa8722476c7709c02559e3aa73aa03918ba2d492eea75abea235".to_string();
+    // Reference: https://secretscan.org/PrivateKeyEth
+    const PUB_KEY_UNCOMPRESSED: &str = "0479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8";
+    const PUB_KEY_COMPRESSED: &str =
+        "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
+    const ETH_ADDRESS: &str = "0x7e5f4552091a69125d5dfcb7b8c2659029395bdf";
 
-        let result = generate_address(pub_key);
+    #[test]
+    fn test_generate_address_valid_uncompressed_key() {
+        let result = generate_address(PUB_KEY_UNCOMPRESSED.to_string());
         assert!(result.is_ok());
         let address = result.unwrap();
-        assert!(address.starts_with("0x"));
-        assert_eq!(address.len(), 42); // 0x + 40 hex chars
+        assert_eq!(address, ETH_ADDRESS);
+    }
+
+    #[test]
+    fn test_generate_address_valid_compressed_key() {
+        let result = generate_address(PUB_KEY_COMPRESSED.to_string());
+        assert!(result.is_ok());
+        let address = result.unwrap();
+        assert_eq!(address, ETH_ADDRESS);
     }
 
     #[test]
@@ -87,18 +98,5 @@ mod tests {
         let result = generate_address(invalid_pub_key);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("Invalid hex format"));
-    }
-
-    #[test]
-    fn test_generate_address_known_key() {
-        // Test with a known public key that should generate a specific address
-        let pub_key =
-            "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798".to_string();
-        let result = generate_address(pub_key);
-        assert!(result.is_ok());
-        // The address format should be correct even if we don't know the exact expected value
-        let address = result.unwrap();
-        assert!(address.starts_with("0x"));
-        assert_eq!(address.len(), 42);
     }
 }

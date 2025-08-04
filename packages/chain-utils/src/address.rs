@@ -22,7 +22,7 @@ use atp_caip::chain_id::ChainId;
 ///
 /// - **eip155**: Ethereum and EVM-compatible chains (generates 0x-prefixed addresses)
 /// - **solana**: Solana blockchain (generates base58-encoded addresses)
-/// - **bip122**: Bitcoin and Bitcoin-compatible chains (generates P2PKH base58-encoded addresses)
+/// - **bip122**: Bitcoin and Bitcoin-compatible chains (generates P2PKH base58-encoded compressed addresses)
 ///
 /// # Examples
 ///
