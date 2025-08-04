@@ -54,7 +54,9 @@ pub fn generate_address(pub_key_sec1_string: String) -> Result<String, String> {
 
     let point = pub_key.to_encoded_point(false);
     let point_bytes = point.as_bytes();
-    assert_eq!(point_bytes[0], 0x04);
+    if point_bytes[0] != 0x04 {
+        return Err("Invalid uncompressed point format".to_string());
+    }
 
     let mut hasher = Keccak256::new();
     hasher.update(&point_bytes[1..]); // Skip the 0x04 prefix
