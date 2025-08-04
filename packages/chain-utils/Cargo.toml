@@ -1,0 +1,11 @@
+[package]
+name = "atp-chain-utils"
+edition = "2021"
+version.workspace = true
+
+[dependencies]
+atp-caip = { workspace = true }
+k256 = { version = "0.13.4", features = ["ecdsa"] }
+sha3 = "0.10.8"
+hex = "0.4.3"
+

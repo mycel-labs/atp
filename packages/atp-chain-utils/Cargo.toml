@@ -1,6 +1,0 @@
-[package]
-name = "atp-chain-utils"
-edition = "2021"
-version.workspace = true
-
-[dependencies]

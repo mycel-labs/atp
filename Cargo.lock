@@ -134,6 +134,12 @@ dependencies = [
 [[package]]
 name = "atp-chain-utils"
 version = "0.1.0"
+dependencies = [
+ "atp-caip",
+ "hex",
+ "k256",
+ "sha3",
+]
 
 [[package]]
 name = "auto_impl"
