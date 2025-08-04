@@ -136,6 +136,7 @@ name = "atp-chain-utils"
 version = "0.1.0"
 dependencies = [
  "atp-caip",
+ "bs58",
  "hex",
  "k256",
  "sha3",
