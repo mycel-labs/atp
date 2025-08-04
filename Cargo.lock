@@ -87,6 +87,7 @@ name = "atp"
 version = "0.1.0"
 dependencies = [
  "atp-caip",
+ "atp-chain-registry",
  "atp-chain-utils",
  "bs58",
  "candid 0.10.14",

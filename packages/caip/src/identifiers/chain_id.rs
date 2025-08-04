@@ -79,6 +79,7 @@ mod tests {
     fn test_chain_id_valid() {
         // Valid chain IDs
         assert!(ChainId::new("eip155", "1").is_ok());
+        assert!(ChainId::new("eip155", "*").is_ok());
         assert!(ChainId::new("solana", "mainnet").is_ok());
         assert!(ChainId::new("cosmos", "cosmoshub-4").is_ok());
         assert!(ChainId::new("polkadot", "91b171bb158e2d3848fa23a9f1c25182").is_ok());
@@ -118,6 +119,10 @@ mod tests {
         assert_eq!(
             ChainId::from_str("eip155:1").unwrap(),
             ChainId::new("eip155", "1").unwrap()
+        );
+        assert_eq!(
+            ChainId::from_str("eip155:*").unwrap(),
+            ChainId::new("eip155", "*").unwrap()
         );
 
         assert_eq!(
