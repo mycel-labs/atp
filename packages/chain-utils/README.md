@@ -47,7 +47,7 @@ let sol_chain = ChainId::new("solana", "mainnet").unwrap(); // Solana mainnet
 let sol_address = generate_address(sol_pubkey.to_string(), sol_chain)?;
 println!("Solana address: {}", sol_address); // Fe3d...
 
-// Generate Bitcoin address
+// Generate Bitcoin address, compressed by default
 let btc_pubkey = "04a34b99f22c790c4e36b2b3c2c35a36db06226e41c692fc82b8b56ac1c540c5bd5b8dec5235a0fa8722476c7709c02559e3aa73aa03918ba2d492eea75abea235";
 let btc_chain = ChainId::new("bip122", "000000000019d6689c085ae165831e93").unwrap(); // Bitcoin mainnet
 let btc_address = generate_address(btc_pubkey.to_string(), btc_chain)?;
