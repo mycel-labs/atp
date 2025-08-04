@@ -6,7 +6,9 @@ use atp::application::dtos::account_messages::*;
 use atp::application::dtos::eip1559::Eip1559TransactionRequestDTO;
 use atp::domain::models::signer::SignatureAlgorithm;
 use atp_caip::curve::Curve;
+use atp_caip::ChainId;
 use candid::{Encode, Principal};
+use std::str::FromStr;
 
 // Convenience function to create TestEnvironment for ATP canister
 pub fn create_atp_canister_env() -> Result<TestEnvironment, Box<dyn std::error::Error>> {
@@ -164,17 +166,22 @@ pub fn sign_eip1559_transaction(
     }
 }
 
-// Helper to get Ethereum address
-pub fn get_eth_address(
+// Helper to generate address for any chain
+pub fn generate_address(
     env: &TestEnvironment,
     account_id: &str,
-) -> Result<GetEthAddressResponse, Box<dyn std::error::Error>> {
-    let request = GetEthAddressRequest {
+    chain_id: &str,
+) -> Result<GenerateAddressResponse, Box<dyn std::error::Error>> {
+    let chain_id_parsed = ChainId::from_str(chain_id)
+        .map_err(|e| format!("Invalid chain ID {}: {}", chain_id, e))?;
+    
+    let request = GenerateAddressRequest {
         account_id: account_id.to_string(),
+        chain_id: chain_id_parsed,
     };
 
-    let result: Result<GetEthAddressResponse, String> =
-        env.query_call("get_eth_address", Encode!(&request).unwrap())?;
+    let result: Result<GenerateAddressResponse, String> =
+        env.query_call("generate_address", Encode!(&request).unwrap())?;
 
     match result {
         Ok(response) => Ok(response),
