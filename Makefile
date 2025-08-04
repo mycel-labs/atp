@@ -1,21 +1,17 @@
 # IC Nix environment version
 IC_NIX_VERSION := 20250627
 
-.PHONY: all build build-atp generate-did-atp test test-package nix-shell-env clean install-tools help 
+.PHONY: all build generate-did test test-package nix-shell-env clean install-tools help 
 # Default target
 all: build-atp generate-did-atp
 
 # Build the project for native target
 build:
-	cargo build --release
-
-# Build the canister for WebAssembly target
-build-atp:
 	cargo build --package atp --target wasm32-unknown-unknown --release
 
 # Generate Candid interface definition
-generate-did-atp: build-atp
-	candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > src/atp/atp.did
+generate-did: build\
+  candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
 
 # Setup nix environment and run tests
 test:
@@ -49,8 +45,7 @@ install-tools:
 help:
 	@echo "Available targets:"
 	@echo "  build           - Build the project for native target"
-	@echo "  build-atp       - Build the ATP canister for WebAssembly target"
-	@echo "  generate-did-atp - Generate Candid interface definition for ATP"
+	@echo "  generate-did - Generate Candid interface definition for ATP"
 	@echo "  test            - Run all tests in nix environment"
 	@echo "  test-package    - Run ic-nosql-tests package tests in nix environment"
 	@echo "  nix-shell-env   - Enter nix-shell with POCKET_IC_BIN exported"
