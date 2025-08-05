@@ -2,10 +2,15 @@
 name = "atp-chain-utils"
 edition = "2021"
 version.workspace = true
-description = "Chain utilities for ATP"
+description = "Chain utilities for ATP(Account Transfer Protocol)"
 license = "MIT"
-keywords = ["blockchain", "configuration"]
-categories = ["web-programming"]
+keywords = ["caip", "blockchain", "protocol", "atp"]
+categories = [
+    "web-programming",
+    "cryptography",
+    "api-bindings",
+    "wasm",
+]
 repository = "https://github.com/mycel-labs/atp"
 
 

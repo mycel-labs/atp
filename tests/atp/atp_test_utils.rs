@@ -2,23 +2,23 @@
 //!
 //! This module provides utilities for testing the ATP canister functionality
 use crate::test_utils::{TestConfig, TestEnvironment};
-use atp::application::dtos::account_messages::*;
-use atp::application::dtos::eip1559::Eip1559TransactionRequestDTO;
-use atp::domain::models::signer::SignatureAlgorithm;
 use atp_caip::curve::Curve;
 use atp_caip::ChainId;
 use candid::{Encode, Principal};
+use ic_atp::application::dtos::account_messages::*;
+use ic_atp::application::dtos::eip1559::Eip1559TransactionRequestDTO;
+use ic_atp::domain::models::signer::SignatureAlgorithm;
 use std::str::FromStr;
 
 // Convenience function to create TestEnvironment for ATP canister
 pub fn create_atp_canister_env() -> Result<TestEnvironment, Box<dyn std::error::Error>> {
-    TestEnvironment::new("atp", "atp")
+    TestEnvironment::new("ic-atp", "ic_atp")
 }
 
 pub fn create_atp_canister_env_with_config(
     config: TestConfig,
 ) -> Result<TestEnvironment, Box<dyn std::error::Error>> {
-    TestEnvironment::new_with_config("atp", "atp", config)
+    TestEnvironment::new_with_config("ic-atp", "ic_atp", config)
 }
 
 // Helper to create a new account
@@ -172,9 +172,9 @@ pub fn generate_address(
     account_id: &str,
     chain_id: &str,
 ) -> Result<GenerateAddressResponse, Box<dyn std::error::Error>> {
-    let chain_id_parsed = ChainId::from_str(chain_id)
-        .map_err(|e| format!("Invalid chain ID {}: {}", chain_id, e))?;
-    
+    let chain_id_parsed =
+        ChainId::from_str(chain_id).map_err(|e| format!("Invalid chain ID {}: {}", chain_id, e))?;
+
     let request = GenerateAddressRequest {
         account_id: account_id.to_string(),
         chain_id: chain_id_parsed,

@@ -27,24 +27,29 @@ dfx deploy
 
 ## Network Configuration
 
-ATP uses different key IDs depending on the network you're deploying to. The key ID is defined in `src/atp/src/utils/config.rs`:
+ATP provides pre-built binaries for different environments that use different key IDs:
 
-```rust
-// Default: For local development with dfx replica
-pub const KEY_ID: &str = "dfx_test_key";
+- **Local environment**: Uses `dfx_test_key` (ic-atp-local.wasm, ic-atp-local.did)
+- **Test environment**: Uses `test_key_1` (ic-atp-test.wasm, ic-atp-test.did)  
+- **Production environment**: Uses `key_1` (ic-atp-production.wasm, ic-atp-production.did)
 
-// For testing on the Internet Computer mainnet (uncomment when needed)
-// pub const KEY_ID: &str = "test_key_1";
+All binaries are available from the [latest GitHub release](https://github.com/mycel-labs/atp/releases/latest).
 
-// For production deployments on the Internet Computer mainnet (uncomment when needed)
-// pub const KEY_ID: &str = "key_1";
+To switch environments, update the dfx.json file to reference the appropriate binary:
+
+```json
+{
+  "canisters": {
+    "atp": {
+      "type": "custom",
+      "candid": "https://github.com/mycel-labs/atp/releases/latest/download/ic-atp-local.did",
+      "wasm": "https://github.com/mycel-labs/atp/releases/latest/download/ic-atp-local.wasm"
+    
+  }
+}
 ```
 
-When switching networks:
-1. Open `src/atp/src/utils/config.rs`
-2. Comment out the current key ID
-3. Uncomment the key ID for your target network
-4. Rebuild and redeploy the canister
+Replace `ic-atp-local` with `ic-atp-test` or `ic-atp-production` as needed for your target environment.
 
 ## Testing Endpoints
 
@@ -63,7 +68,7 @@ Alternatively, you can use the `dfx canister call` command to interact with the 
 dfx canister call atp create_account '(record { algorithm = variant {ecdsa}; curve = variant {secp256k1}; approved_address = principal "YOUR_PRINCIPAL_ID" })'
 ```
 
-#### Get account details
+### Get account details
 ```bash
 dfx canister call atp get_account '(record { account_id = "YOUR_ACCOUNT_ID" })'
 ```

@@ -1,11 +1,14 @@
 [package]
 name = "example-canister"
-version = "0.1.0"
+version.workspace = true
 edition = "2021"
 publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+
+[package.metadata.release]
+release = false
 
 [dependencies]
 ic-nosql = { workspace = true }

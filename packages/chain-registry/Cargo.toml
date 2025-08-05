@@ -2,10 +2,15 @@
 name = "atp-chain-registry"
 version.workspace = true
 edition = "2021"
-description = "Chain registry for blockchain network configuration"
+description = "Chain registry for ATP (Account Transfer Protocol) to manage blockchain configurations and metadata."
 license = "MIT"
-keywords = ["blockchain", "registry", "configuration"]
-categories = ["web-programming"]
+keywords = ["caip", "blockchain", "configuration", "atp"]
+categories = [
+    "web-programming",
+    "cryptography",
+    "api-bindings",
+    "wasm",
+]
 repository = "https://github.com/mycel-labs/atp"
 
 [lib]

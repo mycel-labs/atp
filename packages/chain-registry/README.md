@@ -18,15 +18,6 @@ The Chain Registry provides a unified interface to manage blockchain networks, a
 
 ## 🚀 Quick Start
 
-### Installation
-
-Add this to your `Cargo.toml`:
-
-```toml
-[dependencies]
-atp-chain-registry = "0.1.0"
-```
-
 ### Basic Usage
 
 ```rust

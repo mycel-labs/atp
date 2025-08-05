@@ -4,8 +4,13 @@ edition = "2021"
 version.workspace = true
 description = "Chain Agnostic Improvement Proposals (CAIP) implementation for ATP(Account Transfer Protocol)"
 license = "MIT"
-keywords = ["caip", "blockchain", "protocol"]
-categories = ["web-programming"]
+keywords = ["caip", "blockchain", "protocol", "atp"]
+categories = [
+    "web-programming",
+    "cryptography",
+    "api-bindings",
+    "wasm",
+]
 repository = "https://github.com/mycel-labs/atp"
 
 [lib]

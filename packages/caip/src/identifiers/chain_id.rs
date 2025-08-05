@@ -35,12 +35,12 @@ impl ChainId {
     }
 
     /// Convert this ChainId to a wildcard version by replacing the reference with "*"
-    /// 
+    ///
     /// # Examples
     /// ```
     /// use atp_caip::ChainId;
     /// use std::str::FromStr;
-    /// 
+    ///
     /// let chain_id = ChainId::from_str("eip155:1").unwrap();
     /// let wildcard = chain_id.to_wildcard().unwrap();
     /// assert_eq!(wildcard.to_string(), "eip155:*");

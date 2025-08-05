@@ -7,10 +7,27 @@ use std::collections::HashMap;
 * test_key_1: Test key available on the ICP mainnet.
 * key_1: Production key available on the ICP mainnet.
 */
+
+#[cfg(any(
+    all(feature = "local", feature = "test"),
+    all(feature = "local", feature = "production"),
+    all(feature = "test", feature = "production")
+))]
+compile_error!(
+    "Features `local`, `test`, and `production` are mutually exclusive – enable exactly one."
+);
+
+#[cfg(not(any(feature = "local", feature = "test", feature = "production")))]
+compile_error!("One of the features `local`, `test`, or `production` must be enabled.");
+
+#[cfg(feature = "local")]
 pub const KEY_ID: &str = "dfx_test_key";
-// pub const KEY_ID: &str = "test_key_1";
-// pub const KEY_ID: &str = "key_1";
-//
+
+#[cfg(feature = "test")]
+pub const KEY_ID: &str = "test_key_1";
+
+#[cfg(feature = "production")]
+pub const KEY_ID: &str = "key_1";
 
 pub fn get_chain_registry() -> Result<ChainRegistry, String> {
     // Create hardcoded chain configurations for canister environment
