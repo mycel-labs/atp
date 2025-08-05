@@ -245,6 +245,9 @@
         apps = {
           build-dev = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "build-atp" ''
+              # Set up PATH with Rust toolchain
+              export PATH="${rustToolchain}/bin:$PATH"
+
               cargo build --package atp --target wasm32-unknown-unknown --release
               candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
             '';
@@ -255,6 +258,9 @@
               # Set up SSL certificates
               export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
               export NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+
+              # Set up PATH with Rust toolchain
+              export PATH="${rustToolchain}/bin:$PATH"
 
               # Build WASM for integration tests with test features
               echo "Building WASM for integration tests..."
