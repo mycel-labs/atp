@@ -4,7 +4,7 @@ version.workspace = true
 edition = "2021"
 description = "Chain registry for ATP (Account Transfer Protocol) to manage blockchain configurations and metadata."
 license = "MIT"
-keywords = ["caip", "blockchain", "configuration", "atp", "account-transfer-protocol"]
+keywords = ["caip", "blockchain", "configuration", "atp"]
 categories = [
     "web-programming",
     "cryptography",

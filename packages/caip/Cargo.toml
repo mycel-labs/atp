@@ -4,7 +4,7 @@ edition = "2021"
 version.workspace = true
 description = "Chain Agnostic Improvement Proposals (CAIP) implementation for ATP(Account Transfer Protocol)"
 license = "MIT"
-keywords = ["caip", "blockchain", "protocol", "atp", "account-transfer-protocol"]
+keywords = ["caip", "blockchain", "protocol", "atp"]
 categories = [
     "web-programming",
     "cryptography",
