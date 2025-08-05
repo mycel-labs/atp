@@ -262,10 +262,6 @@
               # Set up PATH with Rust toolchain
               export PATH="${rustToolchain}/bin:$PATH"
 
-              # Build WASM for integration tests with test features
-              echo "Building WASM for integration tests..."
-              cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features test
-
               # Set up environment for integration tests
               export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
               export RUST_BACKTRACE=1
