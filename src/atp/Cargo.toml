@@ -4,8 +4,13 @@ version.workspace = true
 edition = "2021"
 description = "ATP protocol implementation for Internet Computer"
 license = "MIT"
-keywords = ["internet-computer", "atp", "protocol"]
-categories = ["web-programming"]
+keywords = ["internet-computer", "atp", "protocol", "account-transfer-protocol"]
+categories = [
+    "protocols",
+    "web-programming",
+    "cryptography",
+    "wasm",
+]
 repository = "https://github.com/mycel-labs/atp"
 
 [lib]
