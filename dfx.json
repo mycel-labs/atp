@@ -1,9 +1,18 @@
 {
   "canisters": {
     "atp": {
-      "candid": "src/atp/atp.did",
+      "type": "custom",
+      "build": "nix build",
       "package": "atp",
-      "type": "rust"
+      "candid": "result/atp/atp-local.did",
+      "wasm": "result/atp/atp-local.wasm",
+      "metadata": [
+        {
+          "name": "candid:service",
+          "path": "result/atp/atp-local.did",
+          "visibility": "public"
+        }
+      ]
     }
   },
   "defaults": {

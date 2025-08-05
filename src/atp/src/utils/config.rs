@@ -7,10 +7,15 @@ use std::collections::HashMap;
 * test_key_1: Test key available on the ICP mainnet.
 * key_1: Production key available on the ICP mainnet.
 */
+
+#[cfg(feature = "local")]
 pub const KEY_ID: &str = "dfx_test_key";
-// pub const KEY_ID: &str = "test_key_1";
-// pub const KEY_ID: &str = "key_1";
-//
+
+#[cfg(feature = "test")]
+pub const KEY_ID: &str = "test_key_1";
+
+#[cfg(feature = "production")]
+pub const KEY_ID: &str = "key_1";
 
 pub fn get_chain_registry() -> Result<ChainRegistry, String> {
     // Create hardcoded chain configurations for canister environment

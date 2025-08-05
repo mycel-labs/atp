@@ -172,9 +172,9 @@ pub fn generate_address(
     account_id: &str,
     chain_id: &str,
 ) -> Result<GenerateAddressResponse, Box<dyn std::error::Error>> {
-    let chain_id_parsed = ChainId::from_str(chain_id)
-        .map_err(|e| format!("Invalid chain ID {}: {}", chain_id, e))?;
-    
+    let chain_id_parsed =
+        ChainId::from_str(chain_id).map_err(|e| format!("Invalid chain ID {}: {}", chain_id, e))?;
+
     let request = GenerateAddressRequest {
         account_id: account_id.to_string(),
         chain_id: chain_id_parsed,

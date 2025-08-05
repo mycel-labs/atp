@@ -4,6 +4,7 @@ use crate::application::dtos::account_messages::*;
 use crate::application::services::account_service::AccountService;
 use crate::infrastructure::repositories::account_repository_impl::AccountRepositoryImpl;
 use crate::infrastructure::repositories::signer_repository_impl::SignerRepositoryImpl;
+use crate::utils::config::KEY_ID;
 
 // Initialize repositories for service
 fn get_repositories() -> (AccountRepositoryImpl, SignerRepositoryImpl) {
@@ -129,6 +130,15 @@ pub fn generate_address(
 
     // Generate address for the specified chain
     service.generate_address(request)
+}
+
+/// Get the current key ID
+///
+/// Returns the key ID configured for this environment.
+/// Anyone can query this information.
+#[query]
+pub fn get_key_id() -> String {
+    KEY_ID.to_string()
 }
 
 // Export the Candid interface
