@@ -170,16 +170,33 @@
             # TODO: Check Test
             doCheck = false;
 
-            # Build the WASM target
             buildPhase = ''
-              cargo build --package atp --target wasm32-unknown-unknown --release
-              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
+              echo "Building all environments..."
+
+              echo "Building local environment..."
+              cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features local
+              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp-local.did
+              cp target/wasm32-unknown-unknown/release/atp.wasm target/wasm32-unknown-unknown/release/atp-local.wasm
+
+              echo "Building test environment..."
+              cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features test
+              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp-test.did
+              cp target/wasm32-unknown-unknown/release/atp.wasm target/wasm32-unknown-unknown/release/atp-test.wasm
+
+              echo "Building production environment..."
+              cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features production
+              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp-production.did
+              cp target/wasm32-unknown-unknown/release/atp.wasm target/wasm32-unknown-unknown/release/atp-production.wasm
             '';
 
             installPhase = ''
               mkdir -p $out/atp
-              cp target/wasm32-unknown-unknown/release/atp.wasm $out/atp/
-              cp target/wasm32-unknown-unknown/release/atp.did $out/atp/
+              cp target/wasm32-unknown-unknown/release/atp-local.wasm $out/atp/
+              cp target/wasm32-unknown-unknown/release/atp-local.did $out/atp/
+              cp target/wasm32-unknown-unknown/release/atp-test.wasm $out/atp/
+              cp target/wasm32-unknown-unknown/release/atp-test.did $out/atp/
+              cp target/wasm32-unknown-unknown/release/atp-production.wasm $out/atp/
+              cp target/wasm32-unknown-unknown/release/atp-production.did $out/atp/
             '';
 
             meta = with pkgs.lib; {
