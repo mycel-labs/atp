@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Nix
+      uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+        
+    - name: Build with Nix
+      run: nix build
+      
+    - name: Determine release tag
+      id: tag
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "is_tag=true" >> $GITHUB_OUTPUT
+        else
+          echo "tag=latest" >> $GITHUB_OUTPUT
+          echo "is_tag=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.tag.outputs.tag }}
+        name: ${{ steps.tag.outputs.is_tag == 'true' && steps.tag.outputs.tag || 'Latest Build' }}
+        prerelease: ${{ steps.tag.outputs.is_tag == 'false' }}
+        files: |
+          result/atp/*
+        body: |
+          ${{ steps.tag.outputs.is_tag == 'true' && 'Release' || 'Latest build from main branch' }}
+          
+          ## Artifacts
+          - `atp-local.wasm` - Local environment build
+          - `atp-local.did` - Local environment Candid interface
+          - `atp-test.wasm` - Test environment build (Using test_key_1)
+          - `atp-test.did` - Test environment Candid interface (Using test_key_1)
+          - `atp-production.wasm` - Production environment build (Using key_1)
+          - `atp-production.did` - Production environment Candid interface (Using key_1)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
