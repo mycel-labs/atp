@@ -21,32 +21,42 @@ For detailed documentation, see the following:
 - [Contribution Guide](./docs/contribution_guide.md) - How to contribute to ATP
 
 ## Network Configuration
-When deploying ATP to different networks, you'll need to change the key ID in the `utils/config.rs` file:
-- `dfx_test_key`: For local development with dfx replica
-- `test_key_1`: For testing on the Internet Computer mainnet
-- `key_1`: For production deployments on the Internet Computer mainnet
+ATP provides pre-built binaries for different environments:
+- **Local**: `atp-local.wasm` (uses `dfx_test_key`)
+- **Test**: `atp-test.wasm` (uses `test_key_1`)
+- **Production**: `atp-production.wasm` (uses `key_1`)
+
+Download the appropriate binaries from the [latest GitHub release](https://github.com/mycel-labs/atp/releases/latest) and update your dfx.json accordingly.
 
 See the [Getting Started](./docs/getting_started.md) guide for more details on network configuration.
 
 ## Quick Start
 
+### Using Pre-built Binaries (Recommended)
+
+Create a new project and configure it to use ATP from GitHub releases:
+
 ```bash
-# Clone the repository
-git clone https://github.com/mycel-labs/atp
-cd atp
-
-
-# Install the DFINITY SDK if you haven't already
-sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
-## Or use nix-shell
-make nix-shell-env
-
-# Start the local Internet Computer replica
-dfx start --background
-
-# Deploy the ATP canister
-dfx deploy
+# Initialize dfx project
+dfx new my_project
+cd my_project
 ```
+
+Update dfx.json to use ATP binary
+```json
+{
+  "canisters": {
+    "atp": {
+      "type": "custom",
+      "candid": "https://github.com/mycel-labs/atp/releases/latest/download/atp-local.did",
+      "wasm": "https://github.com/mycel-labs/atp/releases/latest/download/atp-local.wasm"
+    }
+  },
+}
+```
+
+Replace `atp-local` with `atp-test` or `atp-production` as needed for your target environment.
+
 
 ## State Transitions
 

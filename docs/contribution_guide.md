@@ -142,22 +142,25 @@ This guide provides information for developers who want to contribute to the ATP
 - Be mindful of the size of messages passed between canisters
 - Consider batching operations when appropriate
 
-### Network Configuration
+### Build Configuration
 
-When working with different networks (local, testnet, mainnet), you need to modify the key ID in the `src/atp/src/utils/config.rs` file:
+ATP uses cargo features to control which key ID is used during compilation:
 
-```rust
-// For local development with dfx replica
-pub const KEY_ID: &str = "dfx_test_key";
+```bash
+# For local development (default)
+cargo build --features local
 
-// For testing on the Internet Computer mainnet
-// pub const KEY_ID: &str = "test_key_1";
+# For test environment  
+cargo build --features test
 
-// For production deployments on the Internet Computer mainnet
-// pub const KEY_ID: &str = "key_1";
+# For production environment
+cargo build --features production
 ```
 
-Uncomment the appropriate key ID based on the network you're targeting and comment out the others.
+The CI/CD pipeline automatically builds all three variants and publishes them to GitHub releases:
+- `atp-local.wasm` - Built with `--features local` (uses `dfx_test_key`)
+- `atp-test.wasm` - Built with `--features test` (uses `test_key_1`)
+- `atp-production.wasm` - Built with `--features production` (uses `key_1`)
 
 ## Getting Help
 

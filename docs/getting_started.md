@@ -27,24 +27,29 @@ dfx deploy
 
 ## Network Configuration
 
-ATP uses different key IDs depending on the network you're deploying to. The key ID is defined in `src/atp/src/utils/config.rs`:
+ATP provides pre-built binaries for different environments that use different key IDs:
 
-```rust
-// Default: For local development with dfx replica
-pub const KEY_ID: &str = "dfx_test_key";
+- **Local environment**: Uses `dfx_test_key` (atp-local.wasm, atp-local.did)
+- **Test environment**: Uses `test_key_1` (atp-test.wasm, atp-test.did)  
+- **Production environment**: Uses `key_1` (atp-production.wasm, atp-production.did)
 
-// For testing on the Internet Computer mainnet (uncomment when needed)
-// pub const KEY_ID: &str = "test_key_1";
+All binaries are available from the [latest GitHub release](https://github.com/mycel-labs/atp/releases/latest).
 
-// For production deployments on the Internet Computer mainnet (uncomment when needed)
-// pub const KEY_ID: &str = "key_1";
+To switch environments, update the dfx.json file to reference the appropriate binary:
+
+```json
+{
+  "canisters": {
+    "atp": {
+      "type": "custom",
+      "candid": "https://github.com/mycel-labs/atp/releases/latest/download/atp-local.did",
+      "wasm": "https://github.com/mycel-labs/atp/releases/latest/download/atp-local.wasm"
+    }
+  }
+}
 ```
 
-When switching networks:
-1. Open `src/atp/src/utils/config.rs`
-2. Comment out the current key ID
-3. Uncomment the key ID for your target network
-4. Rebuild and redeploy the canister
+Replace `atp-local` with `atp-test` or `atp-production` as needed for your target environment.
 
 ## Testing Endpoints
 
