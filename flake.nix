@@ -109,9 +109,9 @@
         # Build helpers
         mkWasmBuild = feature: ''
           echo "Building ${feature} environment..."
-          cargo build --package ic-atp --target wasm32-unknown-unknown --release --no-default-features --features ${feature}
-          candid-extractor target/wasm32-unknown-unknown/release/ic_atp.wasm > target/wasm32-unknown-unknown/release/atp-${feature}.did
-          cp target/wasm32-unknown-unknown/release/ic_atp.wasm target/wasm32-unknown-unknown/release/atp-${feature}.wasm
+          cargo build --package ${cargoToml.package.name} --target wasm32-unknown-unknown --release --no-default-features --features ${feature}
+          candid-extractor target/wasm32-unknown-unknown/release/${cargoToml.lib.name}.wasm > target/wasm32-unknown-unknown/release/${cargoToml.package.name}-${feature}.did
+          cp target/wasm32-unknown-unknown/release/${cargoToml.lib.name}.wasm target/wasm32-unknown-unknown/release/${cargoToml.package.name}-${feature}.wasm
         '';
 
         buildAllEnvironments = ''
@@ -123,12 +123,12 @@
 
         installAllArtifacts = ''
           mkdir -p $out/atp
-          cp target/wasm32-unknown-unknown/release/atp-local.wasm $out/atp/
-          cp target/wasm32-unknown-unknown/release/atp-local.did $out/atp/
-          cp target/wasm32-unknown-unknown/release/atp-test.wasm $out/atp/
-          cp target/wasm32-unknown-unknown/release/atp-test.did $out/atp/
-          cp target/wasm32-unknown-unknown/release/atp-production.wasm $out/atp/
-          cp target/wasm32-unknown-unknown/release/atp-production.did $out/atp/
+          cp target/wasm32-unknown-unknown/release/${cargoToml.package.name}-local.wasm $out/atp/
+          cp target/wasm32-unknown-unknown/release/${cargoToml.package.name}-local.did $out/atp/
+          cp target/wasm32-unknown-unknown/release/${cargoToml.package.name}-test.wasm $out/atp/
+          cp target/wasm32-unknown-unknown/release/${cargoToml.package.name}-test.did $out/atp/
+          cp target/wasm32-unknown-unknown/release/${cargoToml.package.name}-production.wasm $out/atp/
+          cp target/wasm32-unknown-unknown/release/${cargoToml.package.name}-production.did $out/atp/
         '';
 
         # Tool instances
@@ -156,6 +156,7 @@
 
             # Internet Computer tools
             pocket-ic
+            candid-extractor
 
             # System tools
             git
@@ -172,12 +173,8 @@
 
             # Set POCKET_IC_BIN environment variable
             export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
-
-            # Install candid-extractor if not present
-            if ! command -v candid-extractor &> /dev/null; then
-              echo "Installing candid-extractor..."
-              cargo install candid-extractor
-            fi
+            # candid-extractor is provided by Nix
+            export PATH="${candid-extractor}/bin:$PATH"
 
             echo "🦀 ATP Development Environment"
             echo "================================"
@@ -248,8 +245,8 @@
               # Set up PATH with Rust toolchain
               export PATH="${rustToolchain}/bin:$PATH"
 
-              cargo build --package ic-atp --target wasm32-unknown-unknown --release
-              candid-extractor target/wasm32-unknown-unknown/release/ic_atp.wasm > target/wasm32-unknown-unknown/release/atp.did
+              cargo build --package ${cargoToml.package.name} --target wasm32-unknown-unknown --release
+              candid-extractor target/wasm32-unknown-unknown/release/${cargoToml.lib.name}.wasm > target/wasm32-unknown-unknown/release/${cargoToml.package.name}.did
             '';
           };
 

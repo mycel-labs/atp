@@ -44,11 +44,11 @@ jobs:
           ${{ steps.tag.outputs.is_tag == 'true' && 'Release' || 'Latest build from main branch' }}
           
           ## Artifacts
-          - `atp-local.wasm` - Local environment build
-          - `atp-local.did` - Local environment Candid interface
-          - `atp-test.wasm` - Test environment build (Using test_key_1)
-          - `atp-test.did` - Test environment Candid interface (Using test_key_1)
-          - `atp-production.wasm` - Production environment build (Using key_1)
-          - `atp-production.did` - Production environment Candid interface (Using key_1)
+          - `ic-atp-local.wasm` - Local environment build
+          - `ic-atp-local.did` - Local environment Candid interface
+          - `ic-atp-test.wasm` - Test environment build (Using test_key_1)
+          - `ic-atp-test.did` - Test environment Candid interface (Using test_key_1)
+          - `ic-atp-production.wasm` - Production environment build (Using key_1)
+          - `ic-atp-production.did` - Production environment Candid interface (Using key_1)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

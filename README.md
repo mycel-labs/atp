@@ -22,9 +22,9 @@ For detailed documentation, see the following:
 
 ## Network Configuration
 ATP provides pre-built binaries for different environments:
-- **Local**: `atp-local.wasm` (uses `dfx_test_key`)
-- **Test**: `atp-test.wasm` (uses `test_key_1`)
-- **Production**: `atp-production.wasm` (uses `key_1`)
+- **Local**: `ic-atp-local.wasm` (uses `dfx_test_key`)
+- **Test**: `ic-atp-test.wasm` (uses `test_key_1`)
+- **Production**: `ic-atp-production.wasm` (uses `key_1`)
 
 Download the appropriate binaries from the [latest GitHub release](https://github.com/mycel-labs/atp/releases/latest) and update your dfx.json accordingly.
 
@@ -46,12 +46,12 @@ Update dfx.json to use ATP binary
 ```json
 {
   "canisters": {
-    "atp": {
+    "ic-atp": {
       "type": "custom",
-      "candid": "https://github.com/mycel-labs/atp/releases/latest/download/atp-local.did",
-      "wasm": "https://github.com/mycel-labs/atp/releases/latest/download/atp-local.wasm"
+      "candid": "https://github.com/mycel-labs/atp/releases/latest/download/ic-atp-local.did",
+      "wasm": "https://github.com/mycel-labs/atp/releases/latest/download/ic-atp-local.wasm"
     }
-  },
+  }
 }
 ```
 

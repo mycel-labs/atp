@@ -98,9 +98,9 @@ struct GetAccountResponse {
 const ATP_CANISTER_ID: &str = "your_atp_canister_id";
 
 // Note: Make sure you're using the correct ATP binary for your network:
-// - atp-local.wasm: For local development with dfx replica (uses "dfx_test_key")
-// - atp-test.wasm: For testing on the Internet Computer mainnet (uses "test_key_1")
-// - atp-production.wasm: For production deployments (uses "key_1")
+// - ic-atp-local.wasm: For local development with dfx replica (uses "dfx_test_key")
+// - ic-atp-test.wasm: For testing on the Internet Computer mainnet (uses "test_key_1")
+// - ic-atp-production.wasm: For production deployments (uses "key_1")
 // Download the appropriate binary from: https://github.com/mycel-labs/atp/releases/latest
 
 #[ic_cdk::update]

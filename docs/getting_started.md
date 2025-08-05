@@ -29,9 +29,9 @@ dfx deploy
 
 ATP provides pre-built binaries for different environments that use different key IDs:
 
-- **Local environment**: Uses `dfx_test_key` (atp-local.wasm, atp-local.did)
-- **Test environment**: Uses `test_key_1` (atp-test.wasm, atp-test.did)  
-- **Production environment**: Uses `key_1` (atp-production.wasm, atp-production.did)
+- **Local environment**: Uses `dfx_test_key` (ic-atp-local.wasm, ic-atp-local.did)
+- **Test environment**: Uses `test_key_1` (ic-atp-test.wasm, ic-atp-test.did)  
+- **Production environment**: Uses `key_1` (ic-atp-production.wasm, ic-atp-production.did)
 
 All binaries are available from the [latest GitHub release](https://github.com/mycel-labs/atp/releases/latest).
 
@@ -42,14 +42,14 @@ To switch environments, update the dfx.json file to reference the appropriate bi
   "canisters": {
     "atp": {
       "type": "custom",
-      "candid": "https://github.com/mycel-labs/atp/releases/latest/download/atp-local.did",
-      "wasm": "https://github.com/mycel-labs/atp/releases/latest/download/atp-local.wasm"
-    }
+      "candid": "https://github.com/mycel-labs/atp/releases/latest/download/ic-atp-local.did",
+      "wasm": "https://github.com/mycel-labs/atp/releases/latest/download/ic-atp-local.wasm"
+    
   }
 }
 ```
 
-Replace `atp-local` with `atp-test` or `atp-production` as needed for your target environment.
+Replace `ic-atp-local` with `ic-atp-test` or `ic-atp-production` as needed for your target environment.
 
 ## Testing Endpoints
 
@@ -68,7 +68,7 @@ Alternatively, you can use the `dfx canister call` command to interact with the 
 dfx canister call atp create_account '(record { algorithm = variant {ecdsa}; curve = variant {secp256k1}; approved_address = principal "YOUR_PRINCIPAL_ID" })'
 ```
 
-#### Get account details
+### Get account details
 ```bash
 dfx canister call atp get_account '(record { account_id = "YOUR_ACCOUNT_ID" })'
 ```

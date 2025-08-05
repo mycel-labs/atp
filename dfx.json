@@ -4,12 +4,12 @@
       "type": "custom",
       "build": "nix build",
       "package": "atp",
-      "candid": "result/atp/atp-local.did",
-      "wasm": "result/atp/atp-local.wasm",
+      "candid": "result/atp/ic-atp-local.did",
+      "wasm": "result/atp/ic-atp-local.wasm",
       "metadata": [
         {
           "name": "candid:service",
-          "path": "result/atp/atp-local.did",
+          "path": "result/atp/ic-atp-local.did",
           "visibility": "public"
         }
       ]
