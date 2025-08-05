@@ -31,6 +31,12 @@ atp-chain-utils = { workspace = true }
 atp-caip = { workspace = true }
 atp-chain-registry = { workspace = true }
 
+[features]
+default = ["local"]
+local = []
+test = []
+production = []
+
 [dev-dependencies]
 tokio = { version = "1.41.1", features = ["full"] }
 ic-cdk-macros = "0.6"
