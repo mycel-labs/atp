@@ -6,7 +6,6 @@ description = "Chain Agnostic Improvement Proposals (CAIP) implementation for AT
 license = "MIT"
 keywords = ["caip", "blockchain", "protocol", "atp", "account-transfer-protocol"]
 categories = [
-    "protocols",
     "web-programming",
     "cryptography",
     "api-bindings",

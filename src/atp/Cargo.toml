@@ -6,7 +6,6 @@ description = "ATP protocol implementation for Internet Computer"
 license = "MIT"
 keywords = ["internet-computer", "atp", "protocol", "account-transfer-protocol"]
 categories = [
-    "protocols",
     "web-programming",
     "cryptography",
     "wasm",

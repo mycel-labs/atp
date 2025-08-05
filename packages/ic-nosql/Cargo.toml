@@ -6,7 +6,6 @@ description = "A flexible NoSQL database library for Internet Computer canisters
 license = "MIT"
 keywords = ["internet-computer", "nosql", "database", "ic", "canister"]
 categories = [
-  "protocols",
   "database",
   "web-programming",
 ]

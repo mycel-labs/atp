@@ -6,7 +6,6 @@ description = "Chain registry for ATP (Account Transfer Protocol) to manage bloc
 license = "MIT"
 keywords = ["caip", "blockchain", "configuration", "atp", "account-transfer-protocol"]
 categories = [
-    "protocols",
     "web-programming",
     "cryptography",
     "api-bindings",

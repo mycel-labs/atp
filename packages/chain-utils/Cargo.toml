@@ -6,7 +6,6 @@ description = "Chain utilities for ATP(Account Transfer Protocol)"
 license = "MIT"
 keywords = ["caip", "blockchain", "protocol", "atp", "account-transfer-protocol"]
 categories = [
-    "protocols",
     "web-programming",
     "cryptography",
     "api-bindings",
