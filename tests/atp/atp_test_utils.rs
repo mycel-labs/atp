@@ -2,12 +2,12 @@
 //!
 //! This module provides utilities for testing the ATP canister functionality
 use crate::test_utils::{TestConfig, TestEnvironment};
-use atp::application::dtos::account_messages::*;
-use atp::application::dtos::eip1559::Eip1559TransactionRequestDTO;
-use atp::domain::models::signer::SignatureAlgorithm;
 use atp_caip::curve::Curve;
 use atp_caip::ChainId;
 use candid::{Encode, Principal};
+use ic_atp::application::dtos::account_messages::*;
+use ic_atp::application::dtos::eip1559::Eip1559TransactionRequestDTO;
+use ic_atp::domain::models::signer::SignatureAlgorithm;
 use std::str::FromStr;
 
 // Convenience function to create TestEnvironment for ATP canister

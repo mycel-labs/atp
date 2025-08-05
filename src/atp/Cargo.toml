@@ -1,8 +1,8 @@
 [package]
-name = "atp"
+name = "ic-atp"
 version.workspace = true
 edition = "2021"
-description = "ATP protocol implementation for Internet Computer"
+description = "ATP(Account Transfer Protocol) implementation for Internet Computer"
 license = "MIT"
 keywords = ["internet-computer", "atp", "protocol"]
 categories = [
@@ -13,6 +13,7 @@ categories = [
 repository = "https://github.com/mycel-labs/atp"
 
 [lib]
+name = "ic_atp"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]

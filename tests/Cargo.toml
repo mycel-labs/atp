@@ -7,7 +7,7 @@ publish = false
 [dependencies]
 ic-nosql = { workspace = true }
 example-canister = { workspace = true }
-atp = { workspace = true }
+ic-atp = { workspace = true }
 atp-caip = { workspace = true }
 
 candid = "0.10"

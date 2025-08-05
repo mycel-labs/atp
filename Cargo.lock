@@ -83,31 +83,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
-name = "atp"
-version = "0.1.0"
-dependencies = [
- "atp-caip",
- "atp-chain-registry",
- "atp-chain-utils",
- "bs58",
- "candid 0.10.14",
- "ethers-core",
- "getrandom 0.2.16",
- "hex",
- "ic-cdk 0.17.2",
- "ic-cdk-macros 0.6.10",
- "ic-cdk-timers",
- "ic-nosql",
- "ic-stable-structures",
- "ic-web3",
- "k256",
- "serde",
- "serde_json",
- "sha3",
- "tokio",
-]
-
-[[package]]
 name = "atp-caip"
 version = "0.1.0"
 dependencies = [
@@ -1418,6 +1393,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "ic-atp"
+version = "0.1.0"
+dependencies = [
+ "atp-caip",
+ "atp-chain-registry",
+ "atp-chain-utils",
+ "bs58",
+ "candid 0.10.14",
+ "ethers-core",
+ "getrandom 0.2.16",
+ "hex",
+ "ic-cdk 0.17.2",
+ "ic-cdk-macros 0.6.10",
+ "ic-cdk-timers",
+ "ic-nosql",
+ "ic-stable-structures",
+ "ic-web3",
+ "k256",
+ "serde",
+ "serde_json",
+ "sha3",
+ "tokio",
+]
+
+[[package]]
 name = "ic-cdk"
 version = "0.6.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1529,11 +1529,11 @@ dependencies = [
 name = "ic-nosql-tests"
 version = "0.1.0"
 dependencies = [
- "atp",
  "atp-caip",
  "candid 0.10.14",
  "example-canister",
  "hex",
+ "ic-atp",
  "ic-nosql",
  "pocket-ic",
  "serde",
