@@ -4,6 +4,10 @@ version.workspace = true
 edition = "2021"
 publish = false
 
+[package.metadata.release]
+release = false
+
+
 [dependencies]
 ic-nosql = { workspace = true }
 example-canister = { workspace = true }

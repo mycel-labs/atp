@@ -18,15 +18,6 @@ The crate enables developers to build cross-chain applications by providing:
 - Comprehensive error handling and validation
 - Serialization support for configuration and API integration
 
-## Installation
-
-Add this to your `Cargo.toml`:
-
-```toml
-[dependencies]
-atp_caip = "0.1.0"
-```
-
 ## Quick Start
 
 ```rust

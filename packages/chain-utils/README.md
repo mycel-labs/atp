@@ -17,15 +17,6 @@ A Rust library for generating blockchain addresses from public keys obtained via
 | `solana` | Solana | Base58-encoded (32-44 chars) | 32-byte hex string |
 | `bip122` | Bitcoin & Bitcoin-compatible | P2PKH base58 (26-35 chars) | SEC1-encoded hex string |
 
-## Installation
-
-Add to your `Cargo.toml`:
-
-```toml
-[dependencies]
-atp-chain-utils = "0.1.0"
-atp-caip = "0.1.0"
-```
 
 ## Usage
 

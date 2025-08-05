@@ -15,15 +15,6 @@ IC-NoSQL provides a high-level interface for storing and querying structured dat
 - **Data Persistence**: Data survives canister upgrades
 - **CRUD Operations**: Complete Create, Read, Update, Delete support
 
-## Installation
-
-Add to your `Cargo.toml`:
-
-```toml
-[dependencies]
-ic-nosql = { path = "packages/ic-nosql" }
-```
-
 ## Quick Start
 
 ### 1. Define Your Models
