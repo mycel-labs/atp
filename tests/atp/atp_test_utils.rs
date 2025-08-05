@@ -12,13 +12,13 @@ use std::str::FromStr;
 
 // Convenience function to create TestEnvironment for ATP canister
 pub fn create_atp_canister_env() -> Result<TestEnvironment, Box<dyn std::error::Error>> {
-    TestEnvironment::new("atp", "atp")
+    TestEnvironment::new("ic-atp", "ic_atp")
 }
 
 pub fn create_atp_canister_env_with_config(
     config: TestConfig,
 ) -> Result<TestEnvironment, Box<dyn std::error::Error>> {
-    TestEnvironment::new_with_config("atp", "atp", config)
+    TestEnvironment::new_with_config("ic-atp", "ic_atp", config)
 }
 
 // Helper to create a new account
