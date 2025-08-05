@@ -37,6 +37,8 @@
 
         commonBuildInputs = with pkgs; [
           openssl
+          pocket-ic
+          cacert
         ];
 
         commonNativeBuildInputs = with pkgs; [
@@ -164,6 +166,10 @@
             # Add cargo bin to PATH
             export PATH="$HOME/.cargo/bin:$PATH"
 
+            # Set up SSL certificates
+            export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+            export NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+
             # Set POCKET_IC_BIN environment variable
             export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
 
@@ -201,8 +207,25 @@
             nativeBuildInputs = commonNativeBuildInputs ++ [ candid-extractor ];
             buildInputs = commonBuildInputs;
 
-            # TODO: Enable tests when ready
-            doCheck = false;
+            # Enable tests
+            doCheck = true;
+
+            # Override the check phase to only run lib tests and skip integration test directory
+            checkPhase = ''
+              runHook preCheck
+
+              # Set up SSL certificates for PocketIC
+              export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+              export NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+
+              # Set up PocketIC environment
+              export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
+              echo "Using PocketIC at: $POCKET_IC_BIN"
+
+              cargo test --release
+
+              runHook postCheck
+            '';
 
             buildPhase = buildAllEnvironments;
             installPhase = installAllArtifacts;
@@ -229,9 +252,21 @@
 
           test = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "test" ''
-              cargo build --package atp --target wasm32-unknown-unknown --release
+              # Set up SSL certificates
+              export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+              export NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+
+              # Build WASM for integration tests with test features
+              echo "Building WASM for integration tests..."
+              cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features test
+
+              # Set up environment for integration tests
               export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
-              cargo test
+              export RUST_BACKTRACE=1
+
+              # Run all tests including integration tests
+              echo "Running all tests including integration tests..."
+              cargo test --release
             '';
           };
         };
