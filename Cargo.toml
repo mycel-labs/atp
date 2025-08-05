@@ -17,9 +17,9 @@ shared-version = true
 consolidate-commits = true
 
 [workspace.dependencies]
-ic-nosql = { path = "packages/ic-nosql", version = "0.1.0" }
-atp-caip = { path = "packages/caip", version = "0.1.0" }
-atp-chain-registry = { path = "packages/chain-registry", version = "0.1.0" }
-atp-chain-utils = { path = "packages/chain-utils", version = "0.1.0" }
-atp = { path = "src/atp", version = "0.1.0" }
-example-canister = { path = "packages/ic-nosql/example-canister", version = "0.1.0" }
+ic-nosql = { path = "packages/ic-nosql" }
+atp-caip = { path = "packages/caip" }
+atp-chain-registry = { path = "packages/chain-registry" }
+atp-chain-utils = { path = "packages/chain-utils" }
+atp = { path = "src/atp" }
+example-canister = { path = "packages/ic-nosql/example-canister" }
