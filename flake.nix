@@ -109,9 +109,9 @@
         # Build helpers
         mkWasmBuild = feature: ''
           echo "Building ${feature} environment..."
-          cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features ${feature}
-          candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp-${feature}.did
-          cp target/wasm32-unknown-unknown/release/atp.wasm target/wasm32-unknown-unknown/release/atp-${feature}.wasm
+          cargo build --package ic-atp --target wasm32-unknown-unknown --release --no-default-features --features ${feature}
+          candid-extractor target/wasm32-unknown-unknown/release/ic_atp.wasm > target/wasm32-unknown-unknown/release/atp-${feature}.did
+          cp target/wasm32-unknown-unknown/release/ic_atp.wasm target/wasm32-unknown-unknown/release/atp-${feature}.wasm
         '';
 
         buildAllEnvironments = ''
@@ -248,8 +248,8 @@
               # Set up PATH with Rust toolchain
               export PATH="${rustToolchain}/bin:$PATH"
 
-              cargo build --package atp --target wasm32-unknown-unknown --release
-              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
+              cargo build --package ic-atp --target wasm32-unknown-unknown --release
+              candid-extractor target/wasm32-unknown-unknown/release/ic_atp.wasm > target/wasm32-unknown-unknown/release/atp.did
             '';
           };
 
