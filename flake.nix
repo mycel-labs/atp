@@ -22,11 +22,11 @@
           inherit system overlays;
         };
 
-        # Read Cargo.toml metadata
+        # Project metadata
         cargoToml = pkgs.lib.importTOML ./src/atp/Cargo.toml;
         workspaceToml = pkgs.lib.importTOML ./Cargo.toml;
 
-        # Rust toolchain with wasm32 target
+        # Common configurations
         rustToolchain = pkgs.rust-bin.stable.latest.default.override {
           extensions = [
             "rust-src"
@@ -35,55 +35,108 @@
           targets = [ "wasm32-unknown-unknown" ];
         };
 
-        # Download and extract pocket-ic
-        pocket-ic = pkgs.stdenv.mkDerivation rec {
-          pname = "pocket-ic";
-          version = "9.0.3";
+        commonBuildInputs = with pkgs; [
+          openssl
+        ];
 
-          src = pkgs.fetchurl {
-            url = "https://github.com/dfinity/pocketic/releases/download/${version}/pocket-ic-x86_64-linux.gz";
-            sha256 = "sha256-y/QII7qocs7KpD49mZDtItJuBpQuRtCfWQV+jhK1L44=";
+        commonNativeBuildInputs = with pkgs; [
+          rustToolchain
+          pkg-config
+        ];
+
+        # Helper functions
+        mkPocketIC =
+          version: sha256:
+          pkgs.stdenv.mkDerivation rec {
+            pname = "pocket-ic";
+            inherit version;
+
+            src = pkgs.fetchurl {
+              url = "https://github.com/dfinity/pocketic/releases/download/${version}/pocket-ic-x86_64-linux.gz";
+              inherit sha256;
+            };
+
+            nativeBuildInputs = with pkgs; [
+              gzip
+              patchelf
+            ];
+
+            unpackPhase = ''
+              gzip -d < $src > pocket-ic
+            '';
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp pocket-ic $out/bin/
+              chmod +x $out/bin/pocket-ic
+
+              # Patch the binary for NixOS
+              patchelf --set-interpreter ${pkgs.glibc}/lib/ld-linux-x86-64.so.2 $out/bin/pocket-ic
+              patchelf --set-rpath ${
+                pkgs.lib.makeLibraryPath [
+                  pkgs.glibc
+                  pkgs.gcc-unwrapped.lib
+                ]
+              } $out/bin/pocket-ic
+            '';
+
+            buildInputs = with pkgs; [
+              glibc
+              gcc-unwrapped.lib
+            ];
+
+            meta = with pkgs.lib; {
+              description = "PocketIC - Local Internet Computer replica for testing";
+              homepage = "https://github.com/dfinity/pocketic";
+              license = licenses.asl20;
+              platforms = [ "x86_64-linux" ];
+            };
           };
 
-          nativeBuildInputs = with pkgs; [
-            gzip
-            patchelf
-          ];
-
-          unpackPhase = ''
-            gzip -d < $src > pocket-ic
-          '';
-
-          installPhase = ''
-            mkdir -p $out/bin
-            cp pocket-ic $out/bin/
-            chmod +x $out/bin/pocket-ic
-
-            # Patch the binary for NixOS
-            patchelf --set-interpreter ${pkgs.glibc}/lib/ld-linux-x86-64.so.2 $out/bin/pocket-ic
-            patchelf --set-rpath ${
-              pkgs.lib.makeLibraryPath [
-                pkgs.glibc
-                pkgs.gcc-unwrapped.lib
-              ]
-            } $out/bin/pocket-ic
-          '';
-
-          # Add runtime dependencies
-          buildInputs = with pkgs; [
-            glibc
-            gcc-unwrapped.lib
-          ];
-
-          meta = with pkgs.lib; {
-            description = "PocketIC - Local Internet Computer replica for testing";
-            homepage = "https://github.com/dfinity/pocketic";
-            license = licenses.asl20;
-            platforms = [ "x86_64-linux" ];
+        mkCandidExtractor =
+          version: sha256: cargoHash:
+          pkgs.rustPlatform.buildRustPackage rec {
+            pname = "candid-extractor";
+            inherit version;
+            src = pkgs.fetchCrate {
+              inherit pname version sha256;
+            };
+            inherit cargoHash;
           };
-        };
+
+        # Build helpers
+        mkWasmBuild = feature: ''
+          echo "Building ${feature} environment..."
+          cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features ${feature}
+          candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp-${feature}.did
+          cp target/wasm32-unknown-unknown/release/atp.wasm target/wasm32-unknown-unknown/release/atp-${feature}.wasm
+        '';
+
+        buildAllEnvironments = ''
+          echo "Building all environments..."
+          ${mkWasmBuild "local"}
+          ${mkWasmBuild "test"}
+          ${mkWasmBuild "production"}
+        '';
+
+        installAllArtifacts = ''
+          mkdir -p $out/atp
+          cp target/wasm32-unknown-unknown/release/atp-local.wasm $out/atp/
+          cp target/wasm32-unknown-unknown/release/atp-local.did $out/atp/
+          cp target/wasm32-unknown-unknown/release/atp-test.wasm $out/atp/
+          cp target/wasm32-unknown-unknown/release/atp-test.did $out/atp/
+          cp target/wasm32-unknown-unknown/release/atp-production.wasm $out/atp/
+          cp target/wasm32-unknown-unknown/release/atp-production.did $out/atp/
+        '';
+
+        # Tool instances
+        pocket-ic = mkPocketIC "9.0.3" "sha256-y/QII7qocs7KpD49mZDtItJuBpQuRtCfWQV+jhK1L44=";
+        candid-extractor =
+          mkCandidExtractor "0.1.6" "sha256-MTLhYGcrGaLc84YjX2QXMsY4+UrxDvWpFVBw5WZxnN8="
+            "sha256-Mq2tO8gD7v5P7NGH+R4QkyA7jRXo4knIi+eoGT4JzuU=";
       in
       {
+        # Development environment
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             # Rust toolchain
@@ -108,27 +161,24 @@
           ];
 
           shellHook = ''
-                  # Add cargo bin to PATH
-                  export PATH="$HOME/.cargo/bin:$PATH"
+            # Add cargo bin to PATH
+            export PATH="$HOME/.cargo/bin:$PATH"
 
-                  # Set POCKET_IC_BIN environment variable
-                  export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
+            # Set POCKET_IC_BIN environment variable
+            export POCKET_IC_BIN=${pocket-ic}/bin/pocket-ic
 
-                  # Install candid-extractor if not present
-                  if ! command -v candid-extractor &> /dev/null; then
-                    echo "Installing candid-extractor..."
-            self,
-                    cargo install candid-extractor
-                  fi
+            # Install candid-extractor if not present
+            if ! command -v candid-extractor &> /dev/null; then
+              echo "Installing candid-extractor..."
+              cargo install candid-extractor
+            fi
 
-
-                  echo "🦀 ATP Development Environment"
-                  echo "================================"
-                  echo "Rust version: $(rustc --version)"
-                  echo "Cargo version: $(cargo --version)"
-                  echo "pocket-ic version: $(pocket-ic --version)"
-                  echo ""
-
+            echo "🦀 ATP Development Environment"
+            echo "================================"
+            echo "Rust version: $(rustc --version)"
+            echo "Cargo version: $(cargo --version)"
+            echo "pocket-ic version: $(pocket-ic --version)"
+            echo ""
           '';
 
           # Environment variables
@@ -148,56 +198,14 @@
               lockFile = ./Cargo.lock;
             };
 
-            nativeBuildInputs = with pkgs; [
-              rustToolchain
-              pkg-config
-              # Install candid-extractor from crates.io
-              (pkgs.rustPlatform.buildRustPackage rec {
-                pname = "candid-extractor";
-                version = "0.1.6";
-                src = pkgs.fetchCrate {
-                  inherit pname version;
-                  sha256 = "sha256-MTLhYGcrGaLc84YjX2QXMsY4+UrxDvWpFVBw5WZxnN8=";
-                };
-                cargoHash = "sha256-Mq2tO8gD7v5P7NGH+R4QkyA7jRXo4knIi+eoGT4JzuU=";
-              })
-            ];
+            nativeBuildInputs = commonNativeBuildInputs ++ [ candid-extractor ];
+            buildInputs = commonBuildInputs;
 
-            buildInputs = with pkgs; [
-              openssl
-            ];
-
-            # TODO: Check Test
+            # TODO: Enable tests when ready
             doCheck = false;
 
-            buildPhase = ''
-              echo "Building all environments..."
-
-              echo "Building local environment..."
-              cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features local
-              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp-local.did
-              cp target/wasm32-unknown-unknown/release/atp.wasm target/wasm32-unknown-unknown/release/atp-local.wasm
-
-              echo "Building test environment..."
-              cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features test
-              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp-test.did
-              cp target/wasm32-unknown-unknown/release/atp.wasm target/wasm32-unknown-unknown/release/atp-test.wasm
-
-              echo "Building production environment..."
-              cargo build --package atp --target wasm32-unknown-unknown --release --no-default-features --features production
-              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp-production.did
-              cp target/wasm32-unknown-unknown/release/atp.wasm target/wasm32-unknown-unknown/release/atp-production.wasm
-            '';
-
-            installPhase = ''
-              mkdir -p $out/atp
-              cp target/wasm32-unknown-unknown/release/atp-local.wasm $out/atp/
-              cp target/wasm32-unknown-unknown/release/atp-local.did $out/atp/
-              cp target/wasm32-unknown-unknown/release/atp-test.wasm $out/atp/
-              cp target/wasm32-unknown-unknown/release/atp-test.did $out/atp/
-              cp target/wasm32-unknown-unknown/release/atp-production.wasm $out/atp/
-              cp target/wasm32-unknown-unknown/release/atp-production.did $out/atp/
-            '';
+            buildPhase = buildAllEnvironments;
+            installPhase = installAllArtifacts;
 
             meta = with pkgs.lib; {
               description = cargoToml.package.description;
@@ -214,9 +222,8 @@
         apps = {
           build-dev = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "build-atp" ''
-                cargo build --package atp --target wasm32-unknown-unknown --release
-              	candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
-
+              cargo build --package atp --target wasm32-unknown-unknown --release
+              candid-extractor target/wasm32-unknown-unknown/release/atp.wasm > target/wasm32-unknown-unknown/release/atp.did
             '';
           };
 
