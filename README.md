@@ -66,8 +66,8 @@ Accounts in ATP go through various state transitions:
 stateDiagram-v2
     [*] --> Locked: create_account()
     Locked --> Unlocked: transfer_account() by approved address
-    Locked --> Unlocked: unlock() by owner
-    Unlocked --> Locked: lock() by owner or approved address
+    Locked --> Unlocked: unlock() by approved address
+    Unlocked --> Locked: lock() by  approved address
     Unlocked --> Active: activate() by owner
     Active --> Active: sign() by owner
     Active --> [*]
