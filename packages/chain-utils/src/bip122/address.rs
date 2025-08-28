@@ -1,3 +1,4 @@
+use bech32::{segwit, Hrp};
 use k256::elliptic_curve::sec1::ToEncodedPoint;
 use k256::PublicKey;
 use ripemd::Ripemd160;
@@ -127,6 +128,90 @@ pub fn generate_p2pkh_address(
     Ok(address)
 }
 
+/// Generate a Bitcoin P2WPKH (Pay-to-Witness-PubkeyHash) address from a SEC1-encoded public key.
+///
+/// P2WPKH addresses are native SegWit addresses that use bech32 encoding and always
+/// require compressed public keys. They start with "bc1" for mainnet and "tb1" for testnet.
+///
+/// # Arguments
+///
+/// * `pub_key_sec1_string` - A hex-encoded SEC1 public key string (compressed or uncompressed)
+/// * `chain_reference` - The chain reference from CAIP-2 chain identifier
+///
+/// # Returns
+///
+/// * `Ok(String)` - The Bitcoin P2WPKH address as a bech32-encoded string
+/// * `Err(String)` - Error message if the public key is invalid or chain is unsupported
+///
+/// # Examples
+///
+/// ```rust
+/// use atp_chain_utils::bip122::address::generate_p2wpkh_address;
+///
+/// let pubkey = "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
+/// let mainnet_ref = "000000000019d6689c085ae165831e93";
+/// let address = generate_p2wpkh_address(pubkey.to_string(), mainnet_ref.to_string()).unwrap();
+/// // Expected: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4"
+/// ```
+pub fn generate_p2wpkh_address(
+    pub_key_sec1_string: String,
+    chain_reference: String,
+) -> Result<String, String> {
+    // Decode the hex public keybc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4
+    let pub_key_sec1_bytes =
+        hex::decode(&pub_key_sec1_string).map_err(|_| "Invalid hex format.".to_string())?;
+
+    // Parse as SEC1 public key
+    let pub_key = match PublicKey::from_sec1_bytes(&pub_key_sec1_bytes) {
+        Ok(key) => key,
+        Err(_) => return Err("Invalid SEC1 public key format.".to_string()),
+    };
+
+    // P2WPKH always uses compressed public keys
+    let point = pub_key.to_encoded_point(true);
+    let pubkey_bytes = point.as_bytes();
+
+    // Compute SHA256 hash of the compressed public key
+    let mut sha256_hasher = Sha256::new();
+    sha256_hasher.update(pubkey_bytes);
+    let sha256_result = sha256_hasher.finalize();
+
+    // Compute RIPEMD160 hash of SHA256 result
+    let mut ripemd160_hasher = Ripemd160::new();
+    ripemd160_hasher.update(&sha256_result);
+    let ripemd160_result = ripemd160_hasher.finalize();
+
+    // Determine human-readable part based on chain reference
+    let hrp = match chain_reference.as_str() {
+        // Full genesis block hashes
+        "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" => "bc", // Bitcoin mainnet
+        "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943" => "tb", // Bitcoin testnet
+        "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206" => "tb", // Bitcoin regtest (same as testnet)
+        // Truncated versions (CAIP-2 compatible)
+        "000000000019d6689c085ae165831e93" => "bc", // Bitcoin mainnet (truncated)
+        "000000000933ea01ad0ee984209779ba" => "tb", // Bitcoin testnet (truncated)
+        "0f9188f13cb7b2c71f2a335e3a4fc328" => "tb", // Bitcoin regtest (truncated)
+        _ => {
+            return Err(format!(
+                "Unsupported Bitcoin chain reference: {}",
+                chain_reference
+            ))
+        }
+    };
+
+    // Create witness program data (20-byte pubkey hash)
+    let witness_program = &ripemd160_result[..];
+
+    // Create HRP
+    let hrp = Hrp::parse(hrp).map_err(|e| format!("Invalid HRP: {}", e))?;
+
+    // Encode as bech32 with witness version 0
+    let address = segwit::encode(hrp, segwit::VERSION_0, witness_program)
+        .map_err(|e| format!("Bech32 encoding failed: {}", e))?;
+
+    Ok(address)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -141,6 +226,12 @@ mod tests {
     //Reference: https://secretscan.org/PrivateKeyHex.php?symbol=BTC&prefix=6f
     const EXPECTED_UNCOMPRESSED_ADDRESS_TESTNET: &str = "mtoKs9V381UAhUia3d7Vb9GNak8Qvmcsme";
     const EXPECTED_COMPRESSED_ADDRESS_TESTNET: &str = "mrCDrCybB6J1vRfbwM5hemdJz73FwDBC8r";
+
+    // P2WPKH test constants
+    // Reference: https://secretscan.org/Bech32?prefix=bc
+    const EXPECTED_P2WPKH_ADDRESS_MAINNET: &str = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4";
+    // Reference: https://secretscan.org/Bech32?prefix=tb
+    const EXPECTED_P2WPKH_ADDRESS_TESTNET: &str = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx";
 
     #[test]
     fn test_generate_mainnet_address() {
@@ -241,6 +332,52 @@ mod tests {
         let unsupported_ref = "unsupported_chain_ref";
 
         let result = generate_p2pkh_address(pub_key.to_string(), unsupported_ref.to_string(), true);
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .contains("Unsupported Bitcoin chain reference"));
+    }
+
+    #[test]
+    fn test_generate_p2wpkh_mainnet_address() {
+        let mainnet_ref = "000000000019d6689c085ae165831e93";
+
+        let result =
+            generate_p2wpkh_address(PUB_KEY_COMPRESSED.to_string(), mainnet_ref.to_string());
+        assert!(result.is_ok());
+        let address = result.unwrap();
+        assert_eq!(address, EXPECTED_P2WPKH_ADDRESS_MAINNET);
+    }
+
+    #[test]
+    fn test_generate_p2wpkh_testnet_address() {
+        let testnet_ref = "000000000933ea01ad0ee984209779ba";
+
+        let result =
+            generate_p2wpkh_address(PUB_KEY_COMPRESSED.to_string(), testnet_ref.to_string());
+        assert!(result.is_ok());
+        let address = result.unwrap();
+        assert_eq!(address, EXPECTED_P2WPKH_ADDRESS_TESTNET);
+    }
+
+    #[test]
+    fn test_generate_p2wpkh_with_uncompressed_key() {
+        let mainnet_ref = "000000000019d6689c085ae165831e93";
+
+        // P2WPKH should work with uncompressed input but convert to compressed
+        let result =
+            generate_p2wpkh_address(PUB_KEY_UNCOMPRESSED.to_string(), mainnet_ref.to_string());
+        assert!(result.is_ok());
+        let address = result.unwrap();
+        assert_eq!(address, EXPECTED_P2WPKH_ADDRESS_MAINNET);
+    }
+
+    #[test]
+    fn test_p2wpkh_invalid_chain_reference() {
+        let unsupported_ref = "unsupported_chain_ref";
+
+        let result =
+            generate_p2wpkh_address(PUB_KEY_COMPRESSED.to_string(), unsupported_ref.to_string());
         assert!(result.is_err());
         assert!(result
             .unwrap_err()
