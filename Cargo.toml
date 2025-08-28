@@ -11,16 +11,16 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.1.2"
+version = "0.1.3"
 
 [workspace.metadata.release]
 shared-version = true
 consolidate-commits = true
 
 [workspace.dependencies]
-ic-nosql = { path = "packages/ic-nosql", version = "0.1.2" }
-atp-caip = { path = "packages/caip", version = "0.1.2" }
-atp-chain-registry = { path = "packages/chain-registry", version = "0.1.2" }
-atp-chain-utils = { path = "packages/chain-utils", version = "0.1.2" }
-ic-atp = { path = "src/atp", version = "0.1.2" }
-example-canister = { path = "packages/ic-nosql/example-canister", version = "0.1.2" }
+ic-nosql = { path = "packages/ic-nosql", version = "0.1.3" }
+atp-caip = { path = "packages/caip", version = "0.1.3" }
+atp-chain-registry = { path = "packages/chain-registry", version = "0.1.3" }
+atp-chain-utils = { path = "packages/chain-utils", version = "0.1.3" }
+ic-atp = { path = "src/atp", version = "0.1.3" }
+example-canister = { path = "packages/ic-nosql/example-canister", version = "0.1.3" }
