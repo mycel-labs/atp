@@ -84,7 +84,7 @@ checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
 name = "atp-caip"
-version = "0.1.1"
+version = "0.1.3"
 dependencies = [
  "candid 0.10.14",
  "config",
@@ -100,7 +100,7 @@ dependencies = [
 
 [[package]]
 name = "atp-chain-registry"
-version = "0.1.1"
+version = "0.1.3"
 dependencies = [
  "atp-caip",
  "config",
@@ -113,9 +113,10 @@ dependencies = [
 
 [[package]]
 name = "atp-chain-utils"
-version = "0.1.1"
+version = "0.1.3"
 dependencies = [
  "atp-caip",
+ "bech32",
  "bs58",
  "hex",
  "k256",
@@ -196,6 +197,12 @@ name = "base64ct"
 version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55248b47b0caf0546f7988906588779981c43bb1bc9d0c44087278f80cdb44ba"
+
+[[package]]
+name = "bech32"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d965446196e3b7decd44aa7ee49e31d630118f90ef12f97900f262eb915c951d"
 
 [[package]]
 name = "beef"
@@ -947,7 +954,7 @@ dependencies = [
 
 [[package]]
 name = "example-canister"
-version = "0.1.1"
+version = "0.1.3"
 dependencies = [
  "candid 0.10.14",
  "hex",
@@ -1394,7 +1401,7 @@ dependencies = [
 
 [[package]]
 name = "ic-atp"
-version = "0.1.1"
+version = "0.1.3"
 dependencies = [
  "atp-caip",
  "atp-chain-registry",
@@ -1518,7 +1525,7 @@ dependencies = [
 
 [[package]]
 name = "ic-nosql"
-version = "0.1.1"
+version = "0.1.3"
 dependencies = [
  "candid 0.10.14",
  "ic-stable-structures",
@@ -1527,7 +1534,7 @@ dependencies = [
 
 [[package]]
 name = "ic-nosql-tests"
-version = "0.1.1"
+version = "0.1.3"
 dependencies = [
  "atp-caip",
  "candid 0.10.14",
