@@ -22,7 +22,7 @@ use atp_caip::chain_id::ChainId;
 ///
 /// - **eip155**: Ethereum and EVM-compatible chains (generates 0x-prefixed addresses)
 /// - **solana**: Solana blockchain (generates base58-encoded addresses)
-/// - **bip122**: Bitcoin and Bitcoin-compatible chains (generates P2PKH base58-encoded compressed addresses)
+/// - **bip122**: Bitcoin and Bitcoin-compatible chains (generates P2WPKH addresses)
 ///
 /// # Examples
 ///
@@ -49,10 +49,9 @@ pub fn generate_address(pub_key: String, chain_id: ChainId) -> Result<String, St
     let address = match chain_id.namespace() {
         "eip155" => crate::eip155::address::generate_address(pub_key),
         "solana" => crate::solana::address::generate_address(pub_key),
-        "bip122" => crate::bip122::address::generate_p2pkh_address(
+        "bip122" => crate::bip122::address::generate_p2wpkh_address(
             pub_key,
             chain_id.reference().to_string(),
-            true, // Default to compressed format
         ),
         _ => return Err(format!("Unsupported namespace: {}", chain_id.namespace())),
     };
@@ -89,14 +88,22 @@ mod tests {
 
     #[test]
     fn test_generate_address_bitcoin() {
-        let pub_key = "04a34b99f22c790c4e36b2b3c2c35a36db06226e41c692fc82b8b56ac1c540c5bd5b8dec5235a0fa8722476c7709c02559e3aa73aa03918ba2d492eea75abea235".to_string();
+        let pub_key =
+            "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798".to_string();
+        let pub_key_uncompressed =
+            "0479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8".to_string();
+
         let chain_id = ChainId::new("bip122", "000000000019d6689c085ae165831e93").unwrap();
 
-        let result = generate_address(pub_key, chain_id);
+        let result = generate_address(pub_key, chain_id.clone());
         assert!(result.is_ok());
         let address = result.unwrap();
-        assert!(address.starts_with('1')); // Bitcoin mainnet P2PKH
-        assert!(address.len() >= 26 && address.len() <= 35);
+        assert_eq!(address, "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4");
+
+        let result_uncompressed = generate_address(pub_key_uncompressed, chain_id.clone());
+        assert!(result_uncompressed.is_ok());
+        let address_uncompressed = result_uncompressed.unwrap();
+        assert_eq!(address, address_uncompressed);
     }
 
     #[test]
